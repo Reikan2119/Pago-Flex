@@ -94,8 +94,11 @@ fun DashboardScreen(
                                     ) {
                                         Text(
                                             text = compromiso.concepto,
-                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                            modifier = Modifier.weight(1f)
                                         )
+
+                                        Spacer(modifier = Modifier.width(8.dp))
 
                                         Surface(
                                             shape = RoundedCornerShape(8.dp),
@@ -144,26 +147,36 @@ fun DashboardScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    Text(
+                        text = "Opciones y Solicitudes",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         OutlinedButton(
                             onClick = onNavegarAReporte,
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
                         ) {
-                            Text("Reportar Problema")
+                            Text("Reportar un Problema")
                         }
 
                         OutlinedButton(
                             onClick = onNavegarARecomendar,
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
                         ) {
-                            Text("Recomendar Entidad")
+                            Text("Recomendar Organización")
                         }
                     }
                 }

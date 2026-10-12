@@ -26,13 +26,12 @@ class PagoFlexViewModel : ViewModel() {
 
     fun onIntentarLogin(): Boolean {
         val estado = _uiState.value
-
         val regexSoloLetras = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")
 
         val errorNombre = when {
             estado.nombreLogin.isBlank() -> "El nombre es obligatorio."
             estado.nombreLogin.trim().length < 2 -> "El nombre debe tener al menos 2 caracteres."
-            !estado.nombreLogin.matches(regexSoloLetras) -> "El nombre solo puede contener letras (sin números ni símbolos)."
+            !estado.nombreLogin.matches(regexSoloLetras) -> "El nombre solo puede contener letras."
             else -> null
         }
 
@@ -45,9 +44,21 @@ class PagoFlexViewModel : ViewModel() {
             return false
         }
 
-        _uiState.update { it.copy(sesionIniciada = true) }
+        _uiState.update {
+            it.copy(
+                sesionIniciada = true,
+                compromisos = obtenerCompromisosIniciales()
+            )
+        }
         return true
+    }
 
+    private fun obtenerCompromisosIniciales(): List<Compromiso> {
+        return listOf(
+            Compromiso(1, "CP-2026-001", 1, 1, "Cuota GC - Altos del Maipo", "1/12", 85000, "15-11-2026", 1),
+            Compromiso(2, "CP-2026-002", 1, 6, "Mensualidad - Club Los Halcones", "1/1", 45000, "20-11-2026", 1),
+            Compromiso(3, "CP-2026-003", 1, 8, "Arriendo Depo - Plaza Oriente", "3/12", 120000, "05-12-2026", 1)
+        )
     }
 
     fun onMedioPagoCambia(medio: MedioPago) {
