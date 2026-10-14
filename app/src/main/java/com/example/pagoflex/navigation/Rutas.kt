@@ -1,4 +1,4 @@
-package cl.duocuc.miregistro.navigation
+package com.example.pagoflex.navigation
 
 sealed class Ruta(val ruta: String) {
     data object Bienvenida : Ruta("bienvenida")
