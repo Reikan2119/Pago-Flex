@@ -14,6 +14,7 @@ import com.example.pagoflex.ui.screens.ReporteProblemaScreen
 import com.example.pagoflex.ui.screens.RegistrarCompromisoScreen
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
+
 @Composable
 fun AppNavegacion() {
     val navController = rememberNavController()
