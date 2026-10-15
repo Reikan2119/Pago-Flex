@@ -9,6 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
@@ -54,6 +58,7 @@ fun RegistroScreen(
                 value = uiState.nombreRegistro,
                 onValueChange = { viewModel.onNombreRegistroCambia(it) },
                 label = { Text("Nombre Completo") },
+                leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Nombre") },
                 isError = uiState.errorNombreRegistro != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -76,6 +81,7 @@ fun RegistroScreen(
                 value = uiState.correoRegistro,
                 onValueChange = { viewModel.onCorreoRegistroCambia(it) },
                 label = { Text("Correo Electrónico") },
+                leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Correo") },
                 isError = uiState.errorCorreoRegistro != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -99,6 +105,7 @@ fun RegistroScreen(
                 onValueChange = { viewModel.onContrasenaRegistroCambia(it) },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Contraseña") },
                 isError = uiState.errorContrasenaRegistro != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),

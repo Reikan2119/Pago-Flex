@@ -8,6 +8,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
@@ -51,6 +56,7 @@ fun RegistrarCompromisoScreen(
                 value = uiState.rutClienteCompromiso,
                 onValueChange = { viewModel.onRutClienteCompromisoCambia(it) },
                 label = { Text("RUT del Cliente") },
+                leadingIcon = { Icon(Icons.Filled.Badge, contentDescription = "RUT") },
                 isError = uiState.errorRutClienteCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -73,6 +79,7 @@ fun RegistrarCompromisoScreen(
                 value = uiState.conceptoCompromiso,
                 onValueChange = { viewModel.onConceptoCompromisoCambia(it) },
                 label = { Text("Concepto (ej. Cuota GC)") },
+                leadingIcon = { Icon(Icons.Filled.Description, contentDescription = "Concepto") },
                 isError = uiState.errorConceptoCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -95,6 +102,7 @@ fun RegistrarCompromisoScreen(
                 value = uiState.montoCompromiso,
                 onValueChange = { viewModel.onMontoCompromisoCambia(it) },
                 label = { Text("Monto (\$ mayor a 0) (RN-20)") },
+                leadingIcon = { Icon(Icons.Filled.AttachMoney, contentDescription = "Monto") },
                 isError = uiState.errorMontoCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -117,6 +125,7 @@ fun RegistrarCompromisoScreen(
                 value = uiState.fechaVencimientoCompromiso,
                 onValueChange = { viewModel.onFechaVencimientoCompromisoCambia(it) },
                 label = { Text("Fecha de Vencimiento (ej. 30-11-2026)") },
+                leadingIcon = { Icon(Icons.Filled.DateRange, contentDescription = "Fecha") },
                 isError = uiState.errorFechaVencimientoCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),

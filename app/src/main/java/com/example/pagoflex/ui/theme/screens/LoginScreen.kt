@@ -6,6 +6,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.model.RolUsuario
@@ -55,6 +58,7 @@ fun LoginSimuladoScreen(
                 onValueChange = { viewModel.onNombreLoginCambia(it) },
                 label = { Text("Nombre de Usuario") },
                 isError = uiState.errorNombreLogin != null,
+                leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Nombre") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true
@@ -82,6 +86,7 @@ fun LoginSimuladoScreen(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Perfil de Usuario") },
+                    leadingIcon = { Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRol) },
                     isError = uiState.errorRolLogin != null,
                     modifier = Modifier

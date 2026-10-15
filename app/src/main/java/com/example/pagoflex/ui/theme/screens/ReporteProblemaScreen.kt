@@ -6,6 +6,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
@@ -58,6 +61,7 @@ fun ReporteProblemaScreen(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Motivo del Reporte") },
+                    leadingIcon = { Icon(Icons.Filled.Flag, contentDescription = "Motivo") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMotivo) },
                     modifier = Modifier
                         .menuAnchor()
@@ -88,6 +92,7 @@ fun ReporteProblemaScreen(
                 value = uiState.comentarioReporte,
                 onValueChange = { viewModel.onComentarioReporteCambia(it) },
                 label = { Text("Comentario o detalle (Obligatorio si es 'Otro')") },
+                leadingIcon = { Icon(Icons.Filled.ChatBubble, contentDescription = "Comentario") },
                 isError = uiState.errorComentarioReporte != null,
                 modifier = Modifier
                     .fillMaxWidth()

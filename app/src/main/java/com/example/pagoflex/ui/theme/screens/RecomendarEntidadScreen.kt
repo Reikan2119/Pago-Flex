@@ -8,6 +8,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
@@ -52,6 +56,7 @@ fun RecomendarEntidadScreen(
                 value = uiState.nombreEntidadRecomendada,
                 onValueChange = { viewModel.onNombreEntidadCambia(it) },
                 label = { Text("Nombre de la Entidad") },
+                leadingIcon = { Icon(Icons.Filled.Business, contentDescription = "Entidad") },
                 isError = uiState.errorNombreEntidad != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -74,6 +79,7 @@ fun RecomendarEntidadScreen(
                 value = uiState.rubroEntidadRecomendada,
                 onValueChange = { viewModel.onRubroEntidadCambia(it) },
                 label = { Text("Rubro (ej. Municipalidad, Club, etc.)") },
+                leadingIcon = { Icon(Icons.Filled.Category, contentDescription = "Rubro") },
                 isError = uiState.errorRubroEntidad != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -96,6 +102,7 @@ fun RecomendarEntidadScreen(
                 value = uiState.comunaEntidadRecomendada,
                 onValueChange = { viewModel.onComunaEntidadCambia(it) },
                 label = { Text("Comuna") },
+                leadingIcon = { Icon(Icons.Filled.LocationOn, contentDescription = "Comuna") },
                 isError = uiState.errorComunaEntidad != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
