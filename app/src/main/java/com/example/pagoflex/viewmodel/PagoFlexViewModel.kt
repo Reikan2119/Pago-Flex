@@ -15,10 +15,8 @@ class PagoFlexViewModel : ViewModel() {
     val uiState: StateFlow<PagoFlexUiState> = _uiState.asStateFlow()
 
     fun onNombreLoginCambia(nombre: String) {
-        val regexSoloLetrasOVacio = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*$")
-        if (nombre.matches(regexSoloLetrasOVacio)) {
-            _uiState.update { it.copy(nombreLogin = nombre, errorNombreLogin = null) }
-        }
+        val error = if (nombre.any { it.isDigit() }) "El nombre no puede contener números." else null
+        _uiState.update { it.copy(nombreLogin = nombre, errorNombreLogin = error) }
     }
 
     fun onRolCambia(rol: RolUsuario) {
@@ -32,6 +30,7 @@ class PagoFlexViewModel : ViewModel() {
         val errorNombre = when {
             estado.nombreLogin.isBlank() -> "El nombre es obligatorio."
             estado.nombreLogin.trim().length < 2 -> "El nombre debe tener al menos 2 caracteres."
+            estado.nombreLogin.any { it.isDigit() } -> "El nombre no puede contener números."
             !estado.nombreLogin.matches(regexSoloLetras) -> "El nombre solo puede contener letras."
             else -> null
         }
@@ -54,7 +53,8 @@ class PagoFlexViewModel : ViewModel() {
 
     // --- REGISTRO DE USUARIO ---
     fun onNombreRegistroCambia(nombre: String) {
-        _uiState.update { it.copy(nombreRegistro = nombre, errorNombreRegistro = null) }
+        val error = if (nombre.any { it.isDigit() }) "El nombre no puede contener números." else null
+        _uiState.update { it.copy(nombreRegistro = nombre, errorNombreRegistro = error) }
     }
 
     fun onCorreoRegistroCambia(correo: String) {
@@ -67,7 +67,14 @@ class PagoFlexViewModel : ViewModel() {
 
     fun onRegistrarUsuario(): Boolean {
         val estado = _uiState.value
-        val errorNombre = if (estado.nombreRegistro.isBlank()) "El nombre es obligatorio" else null
+        val regexSoloLetras = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")
+        val errorNombre = when {
+            estado.nombreRegistro.isBlank() -> "El nombre es obligatorio"
+            estado.nombreRegistro.trim().length < 2 -> "El nombre debe tener al menos 2 caracteres."
+            estado.nombreRegistro.any { it.isDigit() } -> "El nombre no puede contener números."
+            !estado.nombreRegistro.matches(regexSoloLetras) -> "El nombre solo puede contener letras."
+            else -> null
+        }
         val errorCorreo = if (estado.correoRegistro.isBlank() || !estado.correoRegistro.contains("@")) "Ingresa un correo válido" else null
         val errorContrasena = if (estado.contrasenaRegistro.length < 6) "Mínimo 6 caracteres" else null
 
@@ -205,7 +212,8 @@ class PagoFlexViewModel : ViewModel() {
     }
 
     fun onNombreEntidadCambia(valor: String) {
-        _uiState.update { it.copy(nombreEntidadRecomendada = valor, errorNombreEntidad = null) }
+        val error = if (valor.any { it.isDigit() }) "El nombre no puede contener números." else null
+        _uiState.update { it.copy(nombreEntidadRecomendada = valor, errorNombreEntidad = error) }
     }
 
     fun onRubroEntidadCambia(valor: String) {
@@ -218,7 +226,13 @@ class PagoFlexViewModel : ViewModel() {
 
     fun onEnviarRecomendacion() {
         val estado = _uiState.value
-        val errorNombre = if (estado.nombreEntidadRecomendada.isBlank()) "El nombre es obligatorio" else null
+        val regexSoloLetras = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")
+        val errorNombre = when {
+            estado.nombreEntidadRecomendada.isBlank() -> "El nombre es obligatorio"
+            estado.nombreEntidadRecomendada.any { it.isDigit() } -> "El nombre no puede contener números."
+            !estado.nombreEntidadRecomendada.matches(regexSoloLetras) -> "El nombre solo puede contener letras."
+            else -> null
+        }
         val errorRubro = if (estado.rubroEntidadRecomendada.isBlank()) "El rubro es obligatorio" else null
         val errorComuna = if (estado.comunaEntidadRecomendada.isBlank()) "La comuna es obligatoria" else null
 
