@@ -11,13 +11,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.unit.dp
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +37,9 @@ fun PagoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val compromiso = uiState.compromisoSeleccionadoParaPago
+
+    var mostrarDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
 
     Scaffold(
         topBar = {
@@ -154,17 +166,18 @@ fun PagoScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                OutlinedTextField(
-                    value = uiState.fechaExpiracionTarjeta,
-                    onValueChange = { viewModel.onFechaExpiracionTarjetaCambia(it) },
-                    label = { Text("Vencimiento (MM/AA)") },
-                    placeholder = { Text("MM/AA") },
-                    isError = uiState.errorFechaExpiracionTarjeta != null,
-                    leadingIcon = { Icon(Icons.Filled.DateRange, contentDescription = "Fecha") },
-                        modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true
-                )
+                OutlinedButton(
+                    onClick = { mostrarDatePicker = true },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Filled.DateRange, contentDescription = "Fecha")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (uiState.fechaExpiracionTarjeta.isBlank()) "Vencimiento (MM/AA)" else uiState.fechaExpiracionTarjeta,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
 
                 OutlinedTextField(
                     value = uiState.cvvTarjeta,
@@ -195,6 +208,26 @@ fun PagoScreen(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp)
                 )
+            }
+
+            if (mostrarDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { mostrarDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                val formato = SimpleDateFormat("MM/yy", Locale.getDefault())
+                                viewModel.onFechaExpiracionTarjetaCambia(formato.format(Date(millis)))
+                            }
+                            mostrarDatePicker = false
+                        }) { Text("Aceptar") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { mostrarDatePicker = false }) { Text("Cancelar") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))

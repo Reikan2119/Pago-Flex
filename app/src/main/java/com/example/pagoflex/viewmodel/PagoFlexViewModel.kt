@@ -1,6 +1,10 @@
 package com.example.pagoflex.viewmodel
 
 import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.content.ContentValues
+import androidx.lifecycle.AndroidViewModel
+import com.example.pagoflex.data.PagoFlexDbHelper
 import com.example.pagoflex.model.Compromiso
 import com.example.pagoflex.model.PagoFlexUiState
 import com.example.pagoflex.model.RolUsuario
@@ -9,8 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PagoFlexViewModel : ViewModel() {
+class PagoFlexViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val dbHelper = PagoFlexDbHelper(application)
     private val _uiState = MutableStateFlow(PagoFlexUiState())
     val uiState: StateFlow<PagoFlexUiState> = _uiState.asStateFlow()
 
@@ -45,7 +50,7 @@ class PagoFlexViewModel : ViewModel() {
         _uiState.update {
             it.copy(
                 sesionIniciada = true,
-                compromisos = obtenerCompromisosIniciales()
+                compromisos = cargarCompromisosDesdeDb()
             )
         }
         return true
@@ -95,7 +100,7 @@ class PagoFlexViewModel : ViewModel() {
                 nombreLogin = estado.nombreRegistro,
                 rolSeleccionado = RolUsuario.USUARIO_FINAL,
                 sesionIniciada = true,
-                compromisos = obtenerCompromisosIniciales(),
+                compromisos = cargarCompromisosDesdeDb(),
                 registroUsuarioExitoso = true
             )
         }
@@ -107,6 +112,9 @@ class PagoFlexViewModel : ViewModel() {
     }
 
     fun onPagarCompromiso(compromiso: Compromiso) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply { put("id_estado_compromiso", 3) }
+        db.update("compromiso", values, "id_compromiso=?", arrayOf(compromiso.idCompromiso.toString()))
         _uiState.update { estadoActual ->
             val listaActualizada = estadoActual.compromisos.map {
                 if (it.idCompromiso == compromiso.idCompromiso) {
@@ -136,6 +144,15 @@ class PagoFlexViewModel : ViewModel() {
         if (error != null) {
             _uiState.update { it.copy(errorComentarioReporte = error, reporteExitoso = false) }
         } else {
+            val db = dbHelper.writableDatabase
+            val values = ContentValues().apply {
+                put("id_usuario", 1)
+                put("motivo", estado.motivoReporteSeleccionado)
+                put("comentario", estado.comentarioReporte)
+                put("fecha", java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(java.util.Date()))
+            }
+            db.insert("reporte_problema", null, values)
+
             _uiState.update {
                 it.copy(
                     errorComentarioReporte = null,
@@ -198,6 +215,19 @@ class PagoFlexViewModel : ViewModel() {
                 fechaVencimiento = estado.fechaVencimientoCompromiso,
                 idEstadoCompromiso = 1
             )
+            val db = dbHelper.writableDatabase
+            val values = ContentValues().apply {
+                put("folio", nuevoCompromiso.folio)
+                put("id_usuario_final", nuevoCompromiso.idUsuarioFinal)
+                put("id_empresa", nuevoCompromiso.idEmpresa)
+                put("concepto", nuevoCompromiso.concepto)
+                put("cuota", nuevoCompromiso.cuota)
+                put("monto", nuevoCompromiso.monto)
+                put("fecha_vencimiento", nuevoCompromiso.fechaVencimiento)
+                put("id_estado_compromiso", nuevoCompromiso.idEstadoCompromiso)
+            }
+            db.insert("compromiso", null, values)
+
             _uiState.update {
                 it.copy(
                     compromisos = it.compromisos + nuevoCompromiso,
@@ -246,6 +276,15 @@ class PagoFlexViewModel : ViewModel() {
                 )
             }
         } else {
+            val db = dbHelper.writableDatabase
+            val values = ContentValues().apply {
+                put("nombre", estado.nombreEntidadRecomendada)
+                put("rubro", estado.rubroEntidadRecomendada)
+                put("comuna", estado.comunaEntidadRecomendada)
+                put("fecha", java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(java.util.Date()))
+            }
+            db.insert("recomendacion_entidad", null, values)
+
             _uiState.update {
                 it.copy(
                     nombreEntidadRecomendada = "",
@@ -393,6 +432,32 @@ class PagoFlexViewModel : ViewModel() {
                 pagoTarjetaExitoso = false
             )
         }
+    }
+
+    private fun cargarCompromisosDesdeDb(): List<Compromiso> {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT id_compromiso, folio, id_usuario_final, id_empresa, concepto, cuota, monto, fecha_vencimiento, id_estado_compromiso FROM compromiso",
+            null
+        )
+        val lista = mutableListOf<Compromiso>()
+        while (cursor.moveToNext()) {
+            lista.add(
+                Compromiso(
+                    idCompromiso = cursor.getInt(0),
+                    folio = cursor.getString(1) ?: "",
+                    idUsuarioFinal = cursor.getInt(2),
+                    idEmpresa = cursor.getInt(3),
+                    concepto = cursor.getString(4) ?: "",
+                    cuota = cursor.getString(5) ?: "",
+                    monto = cursor.getInt(6),
+                    fechaVencimiento = cursor.getString(7) ?: "",
+                    idEstadoCompromiso = cursor.getInt(8)
+                )
+            )
+        }
+        cursor.close()
+        return lista
     }
 
     private fun obtenerCompromisosIniciales(): List<Compromiso> {
