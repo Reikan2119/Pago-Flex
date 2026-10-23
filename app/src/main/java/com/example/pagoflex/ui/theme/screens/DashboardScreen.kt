@@ -23,6 +23,7 @@ fun DashboardScreen(
     onNavegarAReporte: () -> Unit,
     onNavegarARecomendar: () -> Unit,
     onNavegarARegistrarCompromiso: () -> Unit,
+    onNavegarAPago: () -> Unit,
     onCerrarSesion: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -113,7 +114,10 @@ fun DashboardScreen(
                     items(uiState.compromisos) { compromiso ->
                         CompromisoItemCard(
                             compromiso = compromiso,
-                            onPagarClick = { viewModel.onPagarCompromiso(compromiso) }
+                            onPagarClick = {
+                                viewModel.onSeleccionarCompromisoParaPago(compromiso)
+                                onNavegarAPago()
+                            }
                         )
                     }
                 }

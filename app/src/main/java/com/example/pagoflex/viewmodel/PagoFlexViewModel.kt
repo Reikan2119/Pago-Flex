@@ -257,6 +257,144 @@ class PagoFlexViewModel : ViewModel() {
         }
     }
 
+    fun onSeleccionarCompromisoParaPago(compromiso: Compromiso) {
+        _uiState.update {
+            it.copy(
+                compromisoSeleccionadoParaPago = compromiso,
+                numeroTarjeta = "",
+                errorNumeroTarjeta = null,
+                nombreTitularTarjeta = "",
+                errorNombreTitularTarjeta = null,
+                cvvTarjeta = "",
+                errorCvvTarjeta = null,
+                fechaExpiracionTarjeta = "",
+                errorFechaExpiracionTarjeta = null,
+                pagoTarjetaExitoso = false
+            )
+        }
+    }
+
+    fun onNumeroTarjetaCambia(valor: String) {
+        val soloDigitos = valor.filter { it.isDigit() }.take(16)
+        val error = if (soloDigitos.any { !it.isDigit() }) "El número de tarjeta solo puede contener dígitos." else null
+        _uiState.update { it.copy(numeroTarjeta = soloDigitos, errorNumeroTarjeta = error) }
+    }
+
+    fun onNombreTitularTarjetaCambia(valor: String) {
+        val error = if (valor.any { it.isDigit() }) "El nombre del titular no puede contener números." else null
+        _uiState.update { it.copy(nombreTitularTarjeta = valor, errorNombreTitularTarjeta = error) }
+    }
+
+    fun onCvvTarjetaCambia(valor: String) {
+        val soloDigitos = valor.filter { it.isDigit() }.take(4)
+        _uiState.update { it.copy(cvvTarjeta = soloDigitos, errorCvvTarjeta = null) }
+    }
+
+    fun onFechaExpiracionTarjetaCambia(valor: String) {
+        val soloDigitos = valor.filter { it.isDigit() }.take(4)
+        val formateado = if (soloDigitos.length <= 2) {
+            soloDigitos
+        } else {
+            "${soloDigitos.substring(0, 2)}/${soloDigitos.substring(2)}"
+        }
+        _uiState.update { it.copy(fechaExpiracionTarjeta = formateado, errorFechaExpiracionTarjeta = null) }
+    }
+
+    fun onRealizarPagoTarjeta(): Boolean {
+        val estado = _uiState.value
+        val compromiso = estado.compromisoSeleccionadoParaPago
+
+        val errorNumero = when {
+            estado.numeroTarjeta.isBlank() -> "El número de tarjeta es obligatorio."
+            estado.numeroTarjeta.length != 16 -> "El número de tarjeta debe tener 16 dígitos."
+            !estado.numeroTarjeta.all { it.isDigit() } -> "El número de tarjeta solo puede contener dígitos."
+            else -> null
+        }
+
+        val errorNombre = when {
+            estado.nombreTitularTarjeta.isBlank() -> "El nombre del titular es obligatorio."
+            estado.nombreTitularTarjeta.any { it.isDigit() } -> "El nombre del titular no puede contener números."
+            else -> null
+        }
+
+        val errorCvv = when {
+            estado.cvvTarjeta.isBlank() -> "El CVV es obligatorio."
+            estado.cvvTarjeta.length !in 3..4 -> "El CVV debe tener 3 o 4 dígitos."
+            !estado.cvvTarjeta.all { it.isDigit() } -> "El CVV solo puede contener dígitos."
+            else -> null
+        }
+
+        val errorFecha = when {
+            !estado.fechaExpiracionTarjeta.matches(Regex("^\\d{2}/\\d{2}$")) ->
+                "Ingresa una fecha de expiración válida (MM/AA)."
+            else -> {
+                val mes = estado.fechaExpiracionTarjeta.substring(0, 2).toIntOrNull()
+                val anio = estado.fechaExpiracionTarjeta.substring(3, 5).toIntOrNull()
+                when {
+                    mes == null || anio == null || mes !in 1..12 ->
+                        "Ingresa una fecha de expiración válida (MM/AA)."
+                    else -> {
+                        val calendario = java.util.Calendar.getInstance()
+                        val anioActual = calendario.get(java.util.Calendar.YEAR) % 100
+                        val mesActual = calendario.get(java.util.Calendar.MONTH) + 1
+                        if (anio < anioActual || (anio == anioActual && mes < mesActual)) {
+                            "La tarjeta está vencida."
+                        } else null
+                    }
+                }
+            }
+        }
+
+        if (errorNumero != null || errorNombre != null || errorCvv != null || errorFecha != null) {
+            _uiState.update {
+                it.copy(
+                    errorNumeroTarjeta = errorNumero,
+                    errorNombreTitularTarjeta = errorNombre,
+                    errorCvvTarjeta = errorCvv,
+                    errorFechaExpiracionTarjeta = errorFecha,
+                    pagoTarjetaExitoso = false
+                )
+            }
+            return false
+        }
+
+        if (compromiso != null) {
+            onPagarCompromiso(compromiso)
+        }
+
+        _uiState.update {
+            it.copy(
+                errorNumeroTarjeta = null,
+                errorNombreTitularTarjeta = null,
+                errorCvvTarjeta = null,
+                errorFechaExpiracionTarjeta = null,
+                pagoTarjetaExitoso = true,
+                numeroTarjeta = "",
+                nombreTitularTarjeta = "",
+                cvvTarjeta = "",
+                fechaExpiracionTarjeta = ""
+            )
+        }
+        return true
+    }
+
+    fun limpiarPagoTarjeta() {
+        _uiState.update {
+            it.copy(
+                compromisoSeleccionadoParaPago = null,
+                numeroTarjeta = "",
+                errorNumeroTarjeta = null,
+                nombreTitularTarjeta = "",
+                errorNombreTitularTarjeta = null,
+                cvvTarjeta = "",
+                errorCvvTarjeta = null,
+                fechaExpiracionTarjeta = "",
+                errorFechaExpiracionTarjeta = null,
+                pagoTarjetaExitoso = false
+            )
+        }
+    }
+
     private fun obtenerCompromisosIniciales(): List<Compromiso> {
         return listOf(
             Compromiso(1, "CP-2026-001", 1, 1, "Cuota GC - Altos del Maipo", "1/12", 85000, "15-11-2026", 1),

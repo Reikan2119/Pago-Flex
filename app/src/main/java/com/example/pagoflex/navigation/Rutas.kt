@@ -8,4 +8,5 @@ sealed class Ruta(val ruta: String) {
     data object Reporte : Ruta("reporte")
     data object Recomendar : Ruta("recomendar")
     data object RegistrarCompromiso : Ruta("registrar_compromiso")
+    data object Pago : Ruta("pago")
 }

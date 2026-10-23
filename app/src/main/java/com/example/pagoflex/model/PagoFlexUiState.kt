@@ -37,5 +37,17 @@ data class PagoFlexUiState(
     val errorRubroEntidad: String? = null,
     val comunaEntidadRecomendada: String = "",
     val errorComunaEntidad: String? = null,
-    val recomendacionExitosa: Boolean = false
+    val recomendacionExitosa: Boolean = false,
+
+    val compromisoSeleccionadoParaPago: Compromiso? = null,
+
+    val numeroTarjeta: String = "",
+    val errorNumeroTarjeta: String? = null,
+    val nombreTitularTarjeta: String = "",
+    val errorNombreTitularTarjeta: String? = null,
+    val cvvTarjeta: String = "",
+    val errorCvvTarjeta: String? = null,
+    val fechaExpiracionTarjeta: String = "",
+    val errorFechaExpiracionTarjeta: String? = null,
+    val pagoTarjetaExitoso: Boolean = false
 )

@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.pagoflex.ui.screens.BienvenidaScreen
 import com.example.pagoflex.ui.screens.DashboardScreen
 import com.example.pagoflex.ui.screens.LoginSimuladoScreen
+import com.example.pagoflex.ui.screens.PagoScreen
 import com.example.pagoflex.ui.screens.RecomendarEntidadScreen
 import com.example.pagoflex.ui.screens.RegistroScreen
 import com.example.pagoflex.ui.screens.ReporteProblemaScreen
@@ -63,6 +64,7 @@ fun AppNavegacion() {
                 onNavegarAReporte = { navController.navigate(Ruta.Reporte.ruta) },
                 onNavegarARecomendar = { navController.navigate(Ruta.Recomendar.ruta) },
                 onNavegarARegistrarCompromiso = { navController.navigate(Ruta.RegistrarCompromiso.ruta) },
+                onNavegarAPago = { navController.navigate(Ruta.Pago.ruta) },
                 onCerrarSesion = {
                     viewModel.cerrarSesion()
                     navController.navigate(Ruta.Bienvenida.ruta) {
@@ -88,6 +90,13 @@ fun AppNavegacion() {
 
         composable(Ruta.RegistrarCompromiso.ruta) {
             RegistrarCompromisoScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() }
+            )
+        }
+
+        composable(Ruta.Pago.ruta) {
+            PagoScreen(
                 viewModel = viewModel,
                 onVolver = { navController.navigateUp() }
             )
