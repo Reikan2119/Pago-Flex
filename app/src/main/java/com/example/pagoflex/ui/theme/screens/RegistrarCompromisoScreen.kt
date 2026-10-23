@@ -3,9 +3,18 @@ package com.example.pagoflex.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.rememberDatePickerState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.Icons
@@ -23,6 +32,9 @@ fun RegistrarCompromisoScreen(
     onVolver: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    var mostrarDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
 
     Scaffold(
         topBar = {
@@ -121,16 +133,18 @@ fun RegistrarCompromisoScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = uiState.fechaVencimientoCompromiso,
-                onValueChange = { viewModel.onFechaVencimientoCompromisoCambia(it) },
-                label = { Text("Fecha de Vencimiento (ej. 30-11-2026)") },
-                leadingIcon = { Icon(Icons.Filled.DateRange, contentDescription = "Fecha") },
-                isError = uiState.errorFechaVencimientoCompromiso != null,
+            OutlinedButton(
+                onClick = { mostrarDatePicker = true },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true
-            )
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Filled.DateRange, contentDescription = "Fecha")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (uiState.fechaVencimientoCompromiso.isBlank()) "Fecha de Vencimiento" else uiState.fechaVencimientoCompromiso,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
             if (uiState.errorFechaVencimientoCompromiso != null) {
                 Text(
                     text = uiState.errorFechaVencimientoCompromiso!!,
@@ -140,6 +154,26 @@ fun RegistrarCompromisoScreen(
                         .fillMaxWidth()
                         .padding(start = 8.dp, top = 4.dp)
                 )
+            }
+
+            if (mostrarDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { mostrarDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                val formato = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                                viewModel.onFechaVencimientoCompromisoCambia(formato.format(Date(millis)))
+                            }
+                            mostrarDatePicker = false
+                        }) { Text("Aceptar") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { mostrarDatePicker = false }) { Text("Cancelar") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.model.Compromiso
+import com.example.pagoflex.model.RolUsuario
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,13 +47,15 @@ fun DashboardScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            val esAgente = uiState.rolSeleccionado == RolUsuario.AGENTE
+
             Text(
-                text = "Hola, ${uiState.nombreLogin.ifBlank { "Usuario" }}",
+                text = if (esAgente) "Panel de Agente PagoFlex" else "Hola, ${uiState.nombreLogin.ifBlank { "Usuario" }}",
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "Perfil: ${uiState.rolSeleccionado?.etiqueta ?: "Sin perfil"}",
+                text = if (esAgente) "Supervisión de cartera y registro de compromisos" else "Perfil: ${uiState.rolSeleccionado?.etiqueta ?: "Sin perfil"}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
@@ -77,19 +80,21 @@ fun DashboardScreen(
                 ) {
                     Text("Recomendar", style = MaterialTheme.typography.labelMedium)
                 }
-                Button(
-                    onClick = onNavegarARegistrarCompromiso,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Registrar", style = MaterialTheme.typography.labelMedium)
+                if (uiState.rolSeleccionado != RolUsuario.USUARIO_FINAL) {
+                    Button(
+                        onClick = onNavegarARegistrarCompromiso,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Registrar", style = MaterialTheme.typography.labelMedium)
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Tus Compromisos de Pago",
+                text = if (esAgente) "Cartera de Compromisos (Supervisión)" else "Tus Compromisos de Pago",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
 
@@ -114,6 +119,7 @@ fun DashboardScreen(
                     items(uiState.compromisos) { compromiso ->
                         CompromisoItemCard(
                             compromiso = compromiso,
+                            mostrarAccionPagar = !esAgente,
                             onPagarClick = {
                                 viewModel.onSeleccionarCompromisoParaPago(compromiso)
                                 onNavegarAPago()
@@ -129,6 +135,7 @@ fun DashboardScreen(
 @Composable
 fun CompromisoItemCard(
     compromiso: Compromiso,
+    mostrarAccionPagar: Boolean = true,
     onPagarClick: () -> Unit
 ) {
     Card(
@@ -174,7 +181,7 @@ fun CompromisoItemCard(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            if (compromiso.idEstadoCompromiso != 3) {
+            if (compromiso.idEstadoCompromiso != 3 && mostrarAccionPagar) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = onPagarClick,

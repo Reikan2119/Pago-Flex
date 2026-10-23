@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Flag
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
@@ -22,6 +24,11 @@ fun ReporteProblemaScreen(
 
     var expandedMotivo by remember { mutableStateOf(false) }
     val motivosDisponibles = listOf("Pago no reflejado", "Monto incorrecto", "Error en convenio", "Otro")
+
+    var fotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val lanzadorFoto = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        fotoUri = uri
+    }
 
     Scaffold(
         topBar = {
@@ -107,6 +114,25 @@ fun ReporteProblemaScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 8.dp, top = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = { lanzadorFoto.launch("image/*") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(if (fotoUri == null) "Adjuntar foto (opcional)" else "Foto seleccionada")
+            }
+            if (fotoUri != null) {
+                Text(
+                    text = fotoUri.toString(),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
