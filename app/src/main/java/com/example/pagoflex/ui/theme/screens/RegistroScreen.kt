@@ -30,11 +30,7 @@ fun RegistroScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Crear Cuenta - PagoFlex") },
-                navigationIcon = {
-                    TextButton(onClick = onVolver) {
-                        Text("Volver")
-                    }
-                }
+                
             )
         }
     ) { paddingValues ->
@@ -128,7 +124,7 @@ fun RegistroScreen(
                 onClick = {
                     val exito = viewModel.onRegistrarUsuario()
                     if (exito) {
-                        onRegistroSuccess()
+                        // mensaje ya se muestra por estado; volver después de un pequeño delay no es posible sin coroutine, así que mostramos mensaje y permitimos volver
                     }
                 },
                 shape = RoundedCornerShape(12.dp),
@@ -137,6 +133,19 @@ fun RegistroScreen(
                     .height(50.dp)
             ) {
                 Text(text = "Registrarse", style = MaterialTheme.typography.titleMedium)
+            }
+
+            if (uiState.registroUsuarioExitoso) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Usuario creado con éxito. Ya puedes iniciar sesión.",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextButton(onClick = onVolver) {
+                    Text("Volver a iniciar sesión")
+                }
             }
         }
     }

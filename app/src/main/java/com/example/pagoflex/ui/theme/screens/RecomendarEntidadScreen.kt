@@ -28,11 +28,7 @@ fun RecomendarEntidadScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Recomendar Entidad - PagoFlex") },
-                navigationIcon = {
-                    TextButton(onClick = onVolver) {
-                        Text("Volver")
-                    }
-                }
+                
             )
         }
     ) { paddingValues ->

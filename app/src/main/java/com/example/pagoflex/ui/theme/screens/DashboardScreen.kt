@@ -77,9 +77,7 @@ fun DashboardScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.dashboard_title)) },
                 actions = {
-                    TextButton(onClick = onCerrarSesion) {
-                        Text("Cerrar Sesión", color = MaterialTheme.colorScheme.error)
-                    }
+                    // cerrar sesión movido al menú del perfil
                 }
             )
         }
@@ -238,3 +236,4 @@ fun DashboardScreen(
     }
 }
 }
+

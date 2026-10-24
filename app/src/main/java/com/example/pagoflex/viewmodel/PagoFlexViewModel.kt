@@ -11,6 +11,7 @@ import com.example.pagoflex.data.repository.CompromisoRepository
 import com.example.pagoflex.data.repository.RecomendacionRepository
 import com.example.pagoflex.data.repository.ReporteRepository
 import com.example.pagoflex.data.repository.UsuarioRepository
+import com.example.pagoflex.model.Recomendacion
 import com.example.pagoflex.model.ReporteProblema
 import com.example.pagoflex.model.Compromiso
 import com.example.pagoflex.model.PagoFlexUiState
@@ -123,13 +124,13 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
             }
             return false
         }
+        usuarioRepository.registrar(estado.nombreRegistro, estado.correoRegistro, estado.contrasenaRegistro)
 
         _uiState.update {
             it.copy(
-                nombreLogin = estado.nombreRegistro,
-                rolSeleccionado = RolUsuario.USUARIO_FINAL,
-                sesionIniciada = true,
-                compromisos = compromisoRepository.obtenerTodos(),
+                nombreRegistro = "",
+                correoRegistro = "",
+                contrasenaRegistro = "",
                 registroUsuarioExitoso = true
             )
         }
@@ -520,7 +521,21 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
         } catch (e: Exception) {
             false
         }
+    }
+    fun cargarRecomendacionesAgente() {
+        val recs = recomendacionGestionRepository.obtenerTodas().map { (id, texto) ->
+            val partes = texto.split(" - ")
+            Recomendacion(id = id, nombre = partes.getOrElse(0) { "" }, estado = partes.getOrElse(1) { "Pendiente" })
+        }
+        _uiState.update { it.copy(recomendacionesAgente = recs) }
+    }
+
+    fun cambiarEstadoRecomendacion(id: Int, estado: String) {
+        recomendacionGestionRepository.cambiarEstado(id, estado)
+        cargarRecomendacionesAgente()
     }}
+
+
 
 
 

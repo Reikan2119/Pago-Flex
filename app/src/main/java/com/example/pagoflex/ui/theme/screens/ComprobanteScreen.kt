@@ -20,7 +20,7 @@ fun ComprobanteScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Comprobante de Pago") },
-                navigationIcon = { TextButton(onClick = onVolver) { Text("Volver") } }
+                
             )
         }
     ) { padding ->
@@ -37,3 +37,4 @@ fun ComprobanteScreen(
         }
     }
 }
+

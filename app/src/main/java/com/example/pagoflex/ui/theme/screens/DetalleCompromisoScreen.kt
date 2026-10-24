@@ -27,7 +27,7 @@ fun DetalleCompromisoScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Detalle de Compromiso") },
-                navigationIcon = { TextButton(onClick = onVolver) { Text("Volver") } }
+                
             )
         }
     ) { padding ->
@@ -65,3 +65,4 @@ fun DetalleCompromisoScreen(
         }
     }
 }
+

@@ -34,11 +34,7 @@ fun ReporteProblemaScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Reportar Problema - PagoFlex") },
-                navigationIcon = {
-                    TextButton(onClick = onVolver) {
-                        Text("Volver")
-                    }
-                }
+                
             )
         }
     ) { paddingValues ->

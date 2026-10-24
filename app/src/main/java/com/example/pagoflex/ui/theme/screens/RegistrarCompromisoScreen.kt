@@ -40,11 +40,7 @@ fun RegistrarCompromisoScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Registrar Compromiso - PagoFlex") },
-                navigationIcon = {
-                    TextButton(onClick = onVolver) {
-                        Text("Volver")
-                    }
-                }
+                
             )
         }
     ) { paddingValues ->

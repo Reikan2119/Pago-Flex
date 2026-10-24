@@ -22,7 +22,7 @@ fun ResumenCobranzaScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Resumen de Cobranza") },
-                navigationIcon = { TextButton(onClick = onVolver) { Text("Volver") } }
+                
             )
         }
     ) { padding ->
@@ -41,3 +41,4 @@ fun ResumenCobranzaScreen(
         }
     }
 }
+

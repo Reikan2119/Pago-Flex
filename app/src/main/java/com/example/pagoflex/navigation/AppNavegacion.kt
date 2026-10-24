@@ -7,11 +7,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.pagoflex.ui.screens.BienvenidaScreen
 import com.example.pagoflex.ui.screens.DashboardScreen
+import com.example.pagoflex.ui.screens.AgenteHomeScreen
+import com.example.pagoflex.ui.screens.HomePerfilScreen
+import com.example.pagoflex.model.RolUsuario
+import com.example.pagoflex.ui.screens.HistorialPagosScreen
 import com.example.pagoflex.ui.screens.LoginSimuladoScreen
 import com.example.pagoflex.ui.screens.PagoScreen
 import com.example.pagoflex.ui.screens.PerfilScreen
 import com.example.pagoflex.ui.screens.ComprobanteScreen
 import com.example.pagoflex.ui.screens.DetalleCompromisoScreen
+import com.example.pagoflex.ui.screens.RecomendacionesAgenteScreen
 import com.example.pagoflex.ui.screens.ReportesAgenteScreen
 import com.example.pagoflex.ui.screens.ResumenCobranzaScreen
 import com.example.pagoflex.ui.screens.RecomendarEntidadScreen
@@ -43,7 +48,9 @@ fun AppNavegacion() {
             LoginSimuladoScreen(
                 viewModel = viewModel,
                 onLoginSuccess = {
-                    navController.navigate(Ruta.Dashboard.ruta) {
+                    val rol = viewModel.uiState.value.rolSeleccionado
+                    val destino = if (rol == RolUsuario.AGENTE) Ruta.AgenteHome.ruta else Ruta.HomePerfil.ruta
+                    navController.navigate(destino) {
                         popUpTo(Ruta.Bienvenida.ruta) { inclusive = true }
                     }
                 },
@@ -63,23 +70,55 @@ fun AppNavegacion() {
             )
         }
 
-        composable(Ruta.Dashboard.ruta) {
-            DashboardScreen(
+        composable(Ruta.AgenteHome.ruta) {
+            AgenteHomeScreen(
                 viewModel = viewModel,
-                onNavegarAReporte = { navController.navigate(Ruta.Reporte.ruta) },
-                onNavegarARecomendar = { navController.navigate(Ruta.Recomendar.ruta) },
-                onNavegarARegistrarCompromiso = { navController.navigate(Ruta.RegistrarCompromiso.ruta) },
-                onNavegarAPago = { navController.navigate(Ruta.Pago.ruta) },
-                onNavegarAPerfil = { navController.navigate(Ruta.Perfil.ruta) },
-                onNavegarADetalle = { navController.navigate(Ruta.DetalleCompromiso.ruta) },
-                onNavegarAReportesAgente = { navController.navigate(Ruta.ReportesAgente.ruta) },
-                onNavegarAResumenCobranza = { navController.navigate(Ruta.ResumenCobranza.ruta) },
+                onNavegarAReportes = { navController.navigate(Ruta.ReportesAgente.ruta) { launchSingleTop = true } },
+                onNavegarARecomendaciones = { navController.navigate(Ruta.RecomendacionesAgente.ruta) { launchSingleTop = true } },
+                onNavegarARegistrar = { navController.navigate(Ruta.RegistrarCompromiso.ruta) { launchSingleTop = true } },
+                onNavegarACartera = { navController.navigate(Ruta.Pagar.ruta) { launchSingleTop = true } },
                 onCerrarSesion = {
                     viewModel.cerrarSesion()
-                    navController.navigate(Ruta.Bienvenida.ruta) {
-                        popUpTo(Ruta.Dashboard.ruta) { inclusive = true }
-                    }
+                    navController.navigate(Ruta.Bienvenida.ruta) { popUpTo(Ruta.AgenteHome.ruta) { inclusive = true } }
                 }
+            )
+        }
+
+        composable(Ruta.HomePerfil.ruta) {
+            HomePerfilScreen(
+                viewModel = viewModel,
+                onNavegarAPagar = { navController.navigate(Ruta.Pagar.ruta) { launchSingleTop = true; popUpTo(Ruta.HomePerfil.ruta) { inclusive = false } } },
+                onNavegarAHistorial = { navController.navigate(Ruta.HistorialPagos.ruta) { launchSingleTop = true; popUpTo(Ruta.HomePerfil.ruta) { inclusive = false } } },
+                onNavegarAEditarPerfil = { navController.navigate(Ruta.Perfil.ruta) { launchSingleTop = true; popUpTo(Ruta.HomePerfil.ruta) { inclusive = false } } },
+                onCerrarSesion = {
+                    viewModel.cerrarSesion()
+                    navController.navigate(Ruta.Bienvenida.ruta) { popUpTo(Ruta.HomePerfil.ruta) { inclusive = true } }
+                }
+            )
+        }
+
+        composable(Ruta.Pagar.ruta) {
+            DashboardScreen(
+                viewModel = viewModel,
+                onNavegarAReporte = { navController.navigate(Ruta.Reporte.ruta) { launchSingleTop = true } },
+                onNavegarARecomendar = { navController.navigate(Ruta.Recomendar.ruta) { launchSingleTop = true } },
+                onNavegarARegistrarCompromiso = { navController.navigate(Ruta.RegistrarCompromiso.ruta) { launchSingleTop = true } },
+                onNavegarAPago = { navController.navigate(Ruta.Pago.ruta) { launchSingleTop = true } },
+                onNavegarAPerfil = { navController.navigate(Ruta.HomePerfil.ruta) { launchSingleTop = true; popUpTo(Ruta.Pagar.ruta) { inclusive = true } } },
+                onNavegarADetalle = { navController.navigate(Ruta.DetalleCompromiso.ruta) { launchSingleTop = true } },
+                onNavegarAReportesAgente = { navController.navigate(Ruta.ReportesAgente.ruta) { launchSingleTop = true } },
+                onNavegarAResumenCobranza = { navController.navigate(Ruta.ResumenCobranza.ruta) { launchSingleTop = true } },
+                onCerrarSesion = {
+                    viewModel.cerrarSesion()
+                    navController.navigate(Ruta.Bienvenida.ruta) { popUpTo(Ruta.Pagar.ruta) { inclusive = true } }
+                }
+            )
+        }
+
+        composable(Ruta.HistorialPagos.ruta) {
+            HistorialPagosScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() }
             )
         }
 
@@ -108,7 +147,7 @@ fun AppNavegacion() {
             PagoScreen(
                 viewModel = viewModel,
                 onVolver = { navController.navigateUp() },
-                onVerComprobante = { navController.navigate(Ruta.Comprobante.ruta) }
+                onVerComprobante = { navController.navigate(Ruta.Comprobante.ruta) { launchSingleTop = true } }
             )
         }
 
@@ -123,7 +162,7 @@ fun AppNavegacion() {
             DetalleCompromisoScreen(
                 viewModel = viewModel,
                 onVolver = { navController.navigateUp() },
-                onPagar = { navController.navigate(Ruta.Pago.ruta) }
+                onPagar = { navController.navigate(Ruta.Pago.ruta) { launchSingleTop = true } }
             )
         }
 
@@ -136,6 +175,13 @@ fun AppNavegacion() {
 
         composable(Ruta.ReportesAgente.ruta) {
             ReportesAgenteScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() }
+            )
+        }
+
+        composable(Ruta.RecomendacionesAgente.ruta) {
+            RecomendacionesAgenteScreen(
                 viewModel = viewModel,
                 onVolver = { navController.navigateUp() }
             )

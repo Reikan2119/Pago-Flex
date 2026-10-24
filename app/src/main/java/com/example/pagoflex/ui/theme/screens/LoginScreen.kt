@@ -27,9 +27,7 @@ fun LoginSimuladoScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Iniciar Sesión - PagoFlex") },
-                navigationIcon = {
-                    TextButton(onClick = onVolver) { Text("Volver") }
-                }
+                
             )
         }
     ) { paddingValues ->
@@ -105,3 +103,4 @@ fun LoginSimuladoScreen(
         }
     }
 }
+

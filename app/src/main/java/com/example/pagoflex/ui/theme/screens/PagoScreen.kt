@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.rememberDatePickerState
+import androidx.activity.compose.BackHandler
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -39,21 +40,18 @@ fun PagoScreen(
     val uiState by viewModel.uiState.collectAsState()
     val compromiso = uiState.compromisoSeleccionadoParaPago
 
+    BackHandler {
+        viewModel.limpiarPagoTarjeta()
+        onVolver()
+    }
+
     var mostrarDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Pagar con Tarjeta - PagoFlex") },
-                navigationIcon = {
-                    TextButton(onClick = {
-                        viewModel.limpiarPagoTarjeta()
-                        onVolver()
-                    }) {
-                        Text("Volver")
-                    }
-                }
+                title = { Text("Pagar con Tarjeta - PagoFlex") }
             )
         }
     ) { paddingValues ->

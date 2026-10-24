@@ -22,9 +22,7 @@ fun PerfilScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Mi Perfil - PagoFlex") },
-                navigationIcon = {
-                    TextButton(onClick = onVolver) { Text("Volver") }
-                }
+                
             )
         }
     ) { paddingValues ->
@@ -78,3 +76,4 @@ fun PerfilScreen(
         }
     }
 }
+

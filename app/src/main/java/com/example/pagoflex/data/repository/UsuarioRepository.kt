@@ -41,4 +41,15 @@ class UsuarioRepository(private val dbHelper: PagoFlexDbHelper) {
         }
         db.update("usuario", values, "id_usuario=?", arrayOf(id.toString()))
     }
+
+    fun registrar(nombre: String, correo: String, contrasena: String) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("nombre", nombre)
+            put("correo", correo)
+            put("contrasena", contrasena)
+            put("id_rol", 1)
+        }
+        db.insert("usuario", null, values)
+    }
 }
