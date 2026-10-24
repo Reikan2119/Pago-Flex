@@ -9,6 +9,11 @@ import com.example.pagoflex.ui.screens.BienvenidaScreen
 import com.example.pagoflex.ui.screens.DashboardScreen
 import com.example.pagoflex.ui.screens.LoginSimuladoScreen
 import com.example.pagoflex.ui.screens.PagoScreen
+import com.example.pagoflex.ui.screens.PerfilScreen
+import com.example.pagoflex.ui.screens.ComprobanteScreen
+import com.example.pagoflex.ui.screens.DetalleCompromisoScreen
+import com.example.pagoflex.ui.screens.ReportesAgenteScreen
+import com.example.pagoflex.ui.screens.ResumenCobranzaScreen
 import com.example.pagoflex.ui.screens.RecomendarEntidadScreen
 import com.example.pagoflex.ui.screens.RegistroScreen
 import com.example.pagoflex.ui.screens.ReporteProblemaScreen
@@ -65,6 +70,10 @@ fun AppNavegacion() {
                 onNavegarARecomendar = { navController.navigate(Ruta.Recomendar.ruta) },
                 onNavegarARegistrarCompromiso = { navController.navigate(Ruta.RegistrarCompromiso.ruta) },
                 onNavegarAPago = { navController.navigate(Ruta.Pago.ruta) },
+                onNavegarAPerfil = { navController.navigate(Ruta.Perfil.ruta) },
+                onNavegarADetalle = { navController.navigate(Ruta.DetalleCompromiso.ruta) },
+                onNavegarAReportesAgente = { navController.navigate(Ruta.ReportesAgente.ruta) },
+                onNavegarAResumenCobranza = { navController.navigate(Ruta.ResumenCobranza.ruta) },
                 onCerrarSesion = {
                     viewModel.cerrarSesion()
                     navController.navigate(Ruta.Bienvenida.ruta) {
@@ -97,6 +106,43 @@ fun AppNavegacion() {
 
         composable(Ruta.Pago.ruta) {
             PagoScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() },
+                onVerComprobante = { navController.navigate(Ruta.Comprobante.ruta) }
+            )
+        }
+
+        composable(Ruta.Perfil.ruta) {
+            PerfilScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() }
+            )
+        }
+
+        composable(Ruta.DetalleCompromiso.ruta) {
+            DetalleCompromisoScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() },
+                onPagar = { navController.navigate(Ruta.Pago.ruta) }
+            )
+        }
+
+        composable(Ruta.Comprobante.ruta) {
+            ComprobanteScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() }
+            )
+        }
+
+        composable(Ruta.ReportesAgente.ruta) {
+            ReportesAgenteScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() }
+            )
+        }
+
+        composable(Ruta.ResumenCobranza.ruta) {
+            ResumenCobranzaScreen(
                 viewModel = viewModel,
                 onVolver = { navController.navigateUp() }
             )

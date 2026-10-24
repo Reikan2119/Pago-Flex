@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">PagoFlex</string>
+    <string name="dashboard_title">PagoFlex - Dashboard</string>
+    <string name="btn_reportar">Reportar</string>
+    <string name="btn_recomendar">Recomendar</string>
+    <string name="btn_registrar">Registrar</string>
+    <string name="btn_cerrar_sesion">Cerrar Sesión</string>
+    <string name="saludo_usuario">Hola, %1$s</string>
+    <string name="perfil">Perfil: %1$s</string>
+    <string name="compromisos_titulo">Tus Compromisos de Pago</string>
+    <string name="compromisos_supervision">Cartera de Compromisos (Supervisión)</string>
+    <string name="sin_compromisos">No hay compromisos registrados.</string>
 </resources>

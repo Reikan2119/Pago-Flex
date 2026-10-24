@@ -4,6 +4,7 @@ data class Compromiso(
     val folio: String,
     val idUsuarioFinal: Int,
     val idEmpresa: Int,
+    val nombreEmpresa: String = "Empresa #$idEmpresa",
     val concepto: String,
     val cuota: String,
     val monto: Int,

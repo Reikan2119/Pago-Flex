@@ -33,7 +33,8 @@ import com.example.pagoflex.viewmodel.PagoFlexViewModel
 @Composable
 fun PagoScreen(
     viewModel: PagoFlexViewModel,
-    onVolver: () -> Unit
+    onVolver: () -> Unit,
+    onVerComprobante: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val compromiso = uiState.compromisoSeleccionadoParaPago
@@ -257,6 +258,13 @@ fun PagoScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Volver al Dashboard")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = onVerComprobante,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Ver comprobante")
                 }
             }
         }

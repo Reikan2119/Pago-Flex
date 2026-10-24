@@ -5,6 +5,13 @@ import android.app.Application
 import android.content.ContentValues
 import androidx.lifecycle.AndroidViewModel
 import com.example.pagoflex.data.PagoFlexDbHelper
+import com.example.pagoflex.data.repository.ReporteGestionRepository
+import com.example.pagoflex.data.repository.RecomendacionGestionRepository
+import com.example.pagoflex.data.repository.CompromisoRepository
+import com.example.pagoflex.data.repository.RecomendacionRepository
+import com.example.pagoflex.data.repository.ReporteRepository
+import com.example.pagoflex.data.repository.UsuarioRepository
+import com.example.pagoflex.model.ReporteProblema
 import com.example.pagoflex.model.Compromiso
 import com.example.pagoflex.model.PagoFlexUiState
 import com.example.pagoflex.model.RolUsuario
@@ -16,6 +23,12 @@ import kotlinx.coroutines.flow.update
 class PagoFlexViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dbHelper = PagoFlexDbHelper(application)
+    private val compromisoRepository = CompromisoRepository(dbHelper)
+    private val reporteRepository = ReporteRepository(dbHelper)
+    private val recomendacionRepository = RecomendacionRepository(dbHelper)
+    private val usuarioRepository = UsuarioRepository(dbHelper)
+    private val reporteGestionRepository = ReporteGestionRepository(dbHelper)
+    private val recomendacionGestionRepository = RecomendacionGestionRepository(dbHelper)
     private val _uiState = MutableStateFlow(PagoFlexUiState())
     val uiState: StateFlow<PagoFlexUiState> = _uiState.asStateFlow()
 
@@ -24,33 +37,49 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
         _uiState.update { it.copy(nombreLogin = nombre, errorNombreLogin = error) }
     }
 
+    fun onCorreoLoginCambia(correo: String) {
+        _uiState.update { it.copy(correoLogin = correo, errorCorreoLogin = null) }
+    }
+
+    fun onContrasenaLoginCambia(contrasena: String) {
+        _uiState.update { it.copy(contrasenaLogin = contrasena, errorContrasenaLogin = null) }
+    }
+
     fun onRolCambia(rol: RolUsuario) {
         _uiState.update { it.copy(rolSeleccionado = rol, errorRolLogin = null) }
     }
 
     fun onIntentarLogin(): Boolean {
         val estado = _uiState.value
-        val regexSoloLetras = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")
+        val errorCorreo = if (estado.correoLogin.isBlank() || !estado.correoLogin.contains("@")) "Ingresa un correo v�lido" else null
+        val errorContrasena = if (estado.contrasenaLogin.isBlank()) "La contrase�a es obligatoria" else null
 
-        val errorNombre = when {
-            estado.nombreLogin.isBlank() -> "El nombre es obligatorio."
-            estado.nombreLogin.trim().length < 2 -> "El nombre debe tener al menos 2 caracteres."
-            estado.nombreLogin.any { it.isDigit() } -> "El nombre no puede contener números."
-            !estado.nombreLogin.matches(regexSoloLetras) -> "El nombre solo puede contener letras."
-            else -> null
+        if (errorCorreo != null || errorContrasena != null) {
+            _uiState.update { it.copy(errorCorreoLogin = errorCorreo, errorContrasenaLogin = errorContrasena) }
+            return false
         }
 
-        val errorRol = if (estado.rolSeleccionado == null) "Debes seleccionar un perfil." else null
-
-        if (errorNombre != null || errorRol != null) {
-            _uiState.update { it.copy(errorNombreLogin = errorNombre, errorRolLogin = errorRol) }
+        val usuario = usuarioRepository.login(estado.correoLogin, estado.contrasenaLogin)
+        if (usuario == null) {
+            _uiState.update { it.copy(errorContrasenaLogin = "Correo o contrase�a incorrectos") }
             return false
+        }
+
+        val rol = when (usuario.idRol) {
+            2 -> RolUsuario.AGENTE
+            3 -> RolUsuario.EJECUTIVO
+            else -> RolUsuario.USUARIO_FINAL
         }
 
         _uiState.update {
             it.copy(
                 sesionIniciada = true,
-                compromisos = cargarCompromisosDesdeDb()
+                idUsuarioLogueado = usuario.id,
+                nombreLogin = usuario.nombre,
+                perfilNombre = usuario.nombre,
+                perfilCorreo = usuario.correo,
+                rolSeleccionado = rol,
+                compromisos = compromisoRepository.obtenerTodos()
             )
         }
         return true
@@ -100,7 +129,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 nombreLogin = estado.nombreRegistro,
                 rolSeleccionado = RolUsuario.USUARIO_FINAL,
                 sesionIniciada = true,
-                compromisos = cargarCompromisosDesdeDb(),
+                compromisos = compromisoRepository.obtenerTodos(),
                 registroUsuarioExitoso = true
             )
         }
@@ -112,9 +141,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun onPagarCompromiso(compromiso: Compromiso) {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply { put("id_estado_compromiso", 3) }
-        db.update("compromiso", values, "id_compromiso=?", arrayOf(compromiso.idCompromiso.toString()))
+        compromisoRepository.marcarPagado(compromiso.idCompromiso)
         _uiState.update { estadoActual ->
             val listaActualizada = estadoActual.compromisos.map {
                 if (it.idCompromiso == compromiso.idCompromiso) {
@@ -144,14 +171,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
         if (error != null) {
             _uiState.update { it.copy(errorComentarioReporte = error, reporteExitoso = false) }
         } else {
-            val db = dbHelper.writableDatabase
-            val values = ContentValues().apply {
-                put("id_usuario", 1)
-                put("motivo", estado.motivoReporteSeleccionado)
-                put("comentario", estado.comentarioReporte)
-                put("fecha", java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(java.util.Date()))
-            }
-            db.insert("reporte_problema", null, values)
+            reporteRepository.insertar(estado.motivoReporteSeleccionado, estado.comentarioReporte)
 
             _uiState.update {
                 it.copy(
@@ -215,18 +235,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 fechaVencimiento = estado.fechaVencimientoCompromiso,
                 idEstadoCompromiso = 1
             )
-            val db = dbHelper.writableDatabase
-            val values = ContentValues().apply {
-                put("folio", nuevoCompromiso.folio)
-                put("id_usuario_final", nuevoCompromiso.idUsuarioFinal)
-                put("id_empresa", nuevoCompromiso.idEmpresa)
-                put("concepto", nuevoCompromiso.concepto)
-                put("cuota", nuevoCompromiso.cuota)
-                put("monto", nuevoCompromiso.monto)
-                put("fecha_vencimiento", nuevoCompromiso.fechaVencimiento)
-                put("id_estado_compromiso", nuevoCompromiso.idEstadoCompromiso)
-            }
-            db.insert("compromiso", null, values)
+            compromisoRepository.insertar(nuevoCompromiso)
 
             _uiState.update {
                 it.copy(
@@ -276,14 +285,11 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 )
             }
         } else {
-            val db = dbHelper.writableDatabase
-            val values = ContentValues().apply {
-                put("nombre", estado.nombreEntidadRecomendada)
-                put("rubro", estado.rubroEntidadRecomendada)
-                put("comuna", estado.comunaEntidadRecomendada)
-                put("fecha", java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(java.util.Date()))
-            }
-            db.insert("recomendacion_entidad", null, values)
+            recomendacionRepository.insertar(
+                estado.nombreEntidadRecomendada,
+                estado.rubroEntidadRecomendada,
+                estado.comunaEntidadRecomendada
+            )
 
             _uiState.update {
                 it.copy(
@@ -399,6 +405,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
 
         if (compromiso != null) {
             onPagarCompromiso(compromiso)
+            compromisoRepository.insertarComprobante(compromiso.idCompromiso, compromiso.monto, compromiso.folio)
         }
 
         _uiState.update {
@@ -408,6 +415,10 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 errorCvvTarjeta = null,
                 errorFechaExpiracionTarjeta = null,
                 pagoTarjetaExitoso = true,
+                comprobanteFecha = java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(java.util.Date()),
+                comprobanteMonto = compromiso?.monto ?: 0,
+                comprobanteFolio = compromiso?.folio ?: "",
+                mostrarComprobante = true,
                 numeroTarjeta = "",
                 nombreTitularTarjeta = "",
                 cvvTarjeta = "",
@@ -434,37 +445,82 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    private fun cargarCompromisosDesdeDb(): List<Compromiso> {
-        val db = dbHelper.readableDatabase
-        val cursor = db.rawQuery(
-            "SELECT id_compromiso, folio, id_usuario_final, id_empresa, concepto, cuota, monto, fecha_vencimiento, id_estado_compromiso FROM compromiso",
-            null
-        )
-        val lista = mutableListOf<Compromiso>()
-        while (cursor.moveToNext()) {
-            lista.add(
-                Compromiso(
-                    idCompromiso = cursor.getInt(0),
-                    folio = cursor.getString(1) ?: "",
-                    idUsuarioFinal = cursor.getInt(2),
-                    idEmpresa = cursor.getInt(3),
-                    concepto = cursor.getString(4) ?: "",
-                    cuota = cursor.getString(5) ?: "",
-                    monto = cursor.getInt(6),
-                    fechaVencimiento = cursor.getString(7) ?: "",
-                    idEstadoCompromiso = cursor.getInt(8)
-                )
-            )
-        }
-        cursor.close()
-        return lista
+
+    fun onPerfilNombreCambia(valor: String) {
+        _uiState.update { it.copy(perfilNombre = valor) }
     }
 
-    private fun obtenerCompromisosIniciales(): List<Compromiso> {
-        return listOf(
-            Compromiso(1, "CP-2026-001", 1, 1, "Cuota GC - Altos del Maipo", "1/12", 85000, "15-11-2026", 1),
-            Compromiso(2, "CP-2026-002", 1, 6, "Mensualidad - Club Los Halcones", "1/1", 45000, "20-11-2026", 1),
-            Compromiso(3, "CP-2026-003", 1, 8, "Arriendo Depo - Plaza Oriente", "3/12", 120000, "05-12-2026", 1)
-        )
+    fun onPerfilCorreoCambia(valor: String) {
+        _uiState.update { it.copy(perfilCorreo = valor) }
     }
-}
+
+    fun onPerfilComunaCambia(valor: String) {
+        _uiState.update { it.copy(perfilComuna = valor) }
+    }
+
+    fun onGuardarPerfil() {
+        val estado = _uiState.value
+        if (estado.idUsuarioLogueado != 0) {
+            usuarioRepository.actualizarPerfil(estado.idUsuarioLogueado, estado.perfilNombre, estado.perfilCorreo, estado.perfilComuna)
+        }
+        _uiState.update { it.copy(nombreLogin = estado.perfilNombre, perfilCorreo = estado.perfilCorreo) }
+    }
+    fun cargarReportesAgente() {
+        val reportes = reporteGestionRepository.obtenerTodos().map { r ->
+            ReporteProblema(
+                id = r.id,
+                idUsuario = r.idUsuario,
+                motivo = r.motivo,
+                comentario = r.comentario,
+                fecha = r.fecha,
+                estado = r.estado,
+                respuesta = r.respuesta,
+                fechaGestion = r.fechaGestion
+            )
+        }
+        _uiState.update { it.copy(reportesAgente = reportes) }
+    }
+
+    fun onRespuestaReporteCambia(valor: String) {
+        _uiState.update { it.copy(respuestaReporte = valor) }
+    }
+
+    fun tomarReporte(id: Int) {
+        reporteGestionRepository.tomar(id)
+        cargarReportesAgente()
+    }
+
+    fun responderReporte(id: Int) {
+        val respuesta = _uiState.value.respuestaReporte
+        reporteGestionRepository.responder(id, respuesta)
+        _uiState.update { it.copy(respuestaReporte = "") }
+        cargarReportesAgente()
+    }
+
+    fun resolverReporte(id: Int) {
+        val respuesta = _uiState.value.respuestaReporte
+        reporteGestionRepository.resolver(id, respuesta.ifBlank { "Resuelto" })
+        _uiState.update { it.copy(respuestaReporte = "") }
+        cargarReportesAgente()
+    }
+
+    fun resumenCobranzaEmpresa(idEmpresa: Int): Triple<Int, Int, Int> {
+        val compromisos = compromisoRepository.obtenerTodos().filter { it.idEmpresa == idEmpresa }
+        val pagados = compromisos.count { it.idEstadoCompromiso == 3 }
+        val pendientes = compromisos.count { it.idEstadoCompromiso != 3 }
+        val vencidos = compromisos.count { it.idEstadoCompromiso != 3 && esVencido(it.fechaVencimiento) }
+        return Triple(pagados, pendientes, vencidos)
+    }
+
+    private fun esVencido(fecha: String): Boolean {
+        return try {
+            val formato = java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault())
+            val venc = formato.parse(fecha)
+            venc != null && venc.before(java.util.Date())
+        } catch (e: Exception) {
+            false
+        }
+    }}
+
+
+

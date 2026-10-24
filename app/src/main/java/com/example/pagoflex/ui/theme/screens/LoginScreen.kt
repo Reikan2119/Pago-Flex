@@ -7,11 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.pagoflex.model.RolUsuario
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,16 +23,12 @@ fun LoginSimuladoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    var expandedRol by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Iniciar Sesión - PagoFlex") },
                 navigationIcon = {
-                    TextButton(onClick = onVolver) {
-                        Text("Volver")
-                    }
+                    TextButton(onClick = onVolver) { Text("Volver") }
                 }
             )
         }
@@ -54,70 +50,43 @@ fun LoginSimuladoScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
-                value = uiState.nombreLogin,
-                onValueChange = { viewModel.onNombreLoginCambia(it) },
-                label = { Text("Nombre de Usuario") },
-                isError = uiState.errorNombreLogin != null,
-                leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Nombre") },
+                value = uiState.correoLogin,
+                onValueChange = { viewModel.onCorreoLoginCambia(it) },
+                label = { Text("Correo electrónico") },
+                leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Correo") },
+                isError = uiState.errorCorreoLogin != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true
             )
-            if (uiState.errorNombreLogin != null) {
+            if (uiState.errorCorreoLogin != null) {
                 Text(
-                    text = uiState.errorNombreLogin!!,
+                    text = uiState.errorCorreoLogin!!,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, top = 4.dp)
+                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ExposedDropdownMenuBox(
-                expanded = expandedRol,
-                onExpandedChange = { expandedRol = !expandedRol },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = uiState.rolSeleccionado?.etiqueta ?: "Selecciona tu perfil",
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Perfil de Usuario") },
-                    leadingIcon = { Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRol) },
-                    isError = uiState.errorRolLogin != null,
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedRol,
-                    onDismissRequest = { expandedRol = false }
-                ) {
-                    RolUsuario.entries.forEach { rol ->
-                        DropdownMenuItem(
-                            text = { Text(rol.etiqueta) },
-                            onClick = {
-                                viewModel.onRolCambia(rol)
-                                expandedRol = false
-                            }
-                        )
-                    }
-                }
-            }
-            if (uiState.errorRolLogin != null) {
+            OutlinedTextField(
+                value = uiState.contrasenaLogin,
+                onValueChange = { viewModel.onContrasenaLoginCambia(it) },
+                label = { Text("Contraseña") },
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Contraseña") },
+                isError = uiState.errorContrasenaLogin != null,
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true
+            )
+            if (uiState.errorContrasenaLogin != null) {
                 Text(
-                    text = uiState.errorRolLogin!!,
+                    text = uiState.errorContrasenaLogin!!,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, top = 4.dp)
+                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp)
                 )
             }
 
@@ -126,14 +95,10 @@ fun LoginSimuladoScreen(
             Button(
                 onClick = {
                     val exito = viewModel.onIntentarLogin()
-                    if (exito) {
-                        onLoginSuccess()
-                    }
+                    if (exito) onLoginSuccess()
                 },
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
+                modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
                 Text(text = "Ingresar", style = MaterialTheme.typography.titleMedium)
             }

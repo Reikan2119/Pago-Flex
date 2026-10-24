@@ -1,10 +1,19 @@
 package com.example.pagoflex.model
 data class PagoFlexUiState(
+    val correoLogin: String = "",
+    val errorCorreoLogin: String? = null,
+    val contrasenaLogin: String = "",
+    val errorContrasenaLogin: String? = null,
     val nombreLogin: String = "",
     val errorNombreLogin: String? = null,
     val rolSeleccionado: RolUsuario? = null,
     val errorRolLogin: String? = null,
     val sesionIniciada: Boolean = false,
+
+    val idUsuarioLogueado: Int = 0,
+    val perfilNombre: String = "",
+    val perfilCorreo: String = "",
+    val perfilComuna: String = "",
 
     val nombreRegistro: String = "",
     val errorNombreRegistro: String? = null,
@@ -49,5 +58,13 @@ data class PagoFlexUiState(
     val errorCvvTarjeta: String? = null,
     val fechaExpiracionTarjeta: String = "",
     val errorFechaExpiracionTarjeta: String? = null,
-    val pagoTarjetaExitoso: Boolean = false
+    val pagoTarjetaExitoso: Boolean = false,
+
+    val comprobanteFecha: String = "",
+    val comprobanteMonto: Int = 0,
+    val comprobanteFolio: String = "",
+    val mostrarComprobante: Boolean = false,
+
+    val reportesAgente: List<ReporteProblema> = emptyList(),
+    val respuestaReporte: String = ""
 )
