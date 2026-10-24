@@ -10,4 +10,5 @@
     <string name="compromisos_titulo">Tus Compromisos de Pago</string>
     <string name="compromisos_supervision">Cartera de Compromisos (Supervisión)</string>
     <string name="sin_compromisos">No hay compromisos registrados.</string>
-</resources>
+    <string name="btn_volver">Volver</string>\n    <string name="btn_pagar">Pagar</string>\n    <string name="btn_guardar">Guardar cambios</string>\n    <string name="bienvenido">Bienvenido de nuevo</string>\n    <string name="ingresar">Ingresar</string>\n</resources>
+

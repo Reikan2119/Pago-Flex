@@ -8,7 +8,7 @@ class PagoFlexDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
 
     companion object {
         const val DB_NAME = "pagoflex.db"
-        const val DB_VERSION = 2
+        const val DB_VERSION = 3
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -24,6 +24,8 @@ class PagoFlexDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
                 nombre TEXT NOT NULL,
                 correo TEXT,
                 contrasena TEXT,
+                rut TEXT,
+                comuna TEXT,
                 id_rol INTEGER,
                 id_empresa INTEGER,
                 FOREIGN KEY(id_rol) REFERENCES rol_usuario(id_rol)
@@ -92,9 +94,9 @@ class PagoFlexDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         db.execSQL("INSERT INTO estado_compromiso (id_estado, nombre) VALUES (1,'Pendiente')")
         db.execSQL("INSERT INTO estado_compromiso (id_estado, nombre) VALUES (3,'Pagado')")
 
-        db.execSQL("INSERT INTO usuario (id_usuario, nombre, correo, contrasena, id_rol, id_empresa) VALUES (1,'Usuario Demo','usuario@demo.cl','123456',1,NULL)")
-        db.execSQL("INSERT INTO usuario (id_usuario, nombre, correo, contrasena, id_rol, id_empresa) VALUES (2,'Agente Demo','agente@demo.cl','123456',2,NULL)")
-        db.execSQL("INSERT INTO usuario (id_usuario, nombre, correo, contrasena, id_rol, id_empresa) VALUES (3,'Ejecutivo Demo','ejecutivo@demo.cl','123456',3,1)")
+        db.execSQL("INSERT INTO usuario (id_usuario, nombre, correo, contrasena, rut, comuna, id_rol, id_empresa) VALUES (1,'Usuario Demo','usuario@demo.cl','123456','12.345.678-9','Santiago',1,NULL)")
+        db.execSQL("INSERT INTO usuario (id_usuario, nombre, correo, contrasena, rut, comuna, id_rol, id_empresa) VALUES (2,'Agente Demo','agente@demo.cl','123456','98.765.432-1','Santiago',2,NULL)")
+        db.execSQL("INSERT INTO usuario (id_usuario, nombre, correo, contrasena, rut, comuna, id_rol, id_empresa) VALUES (3,'Ejecutivo Demo','ejecutivo@demo.cl','123456','11.222.333-4','Santiago',3,1)")
 
         db.execSQL("INSERT INTO compromiso (id_compromiso, folio, id_usuario_final, id_empresa, concepto, cuota, monto, fecha_vencimiento, id_estado_compromiso) VALUES (1,'CP-2026-001',1,1,'Cuota GC - Altos del Maipo','1/12',85000,'15-11-2026',1)")
         db.execSQL("INSERT INTO compromiso (id_compromiso, folio, id_usuario_final, id_empresa, concepto, cuota, monto, fecha_vencimiento, id_estado_compromiso) VALUES (2,'CP-2026-002',1,6,'Mensualidad - Club Los Halcones','1/1',45000,'20-11-2026',1)")

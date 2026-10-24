@@ -24,6 +24,9 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +70,7 @@ fun RegistrarCompromisoScreen(
                 leadingIcon = { Icon(Icons.Filled.Badge, contentDescription = "RUT") },
                 isError = uiState.errorRutClienteCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorRutClienteCompromiso != null) {
@@ -90,7 +93,7 @@ fun RegistrarCompromisoScreen(
                 leadingIcon = { Icon(Icons.Filled.Description, contentDescription = "Concepto") },
                 isError = uiState.errorConceptoCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorConceptoCompromiso != null) {
@@ -113,7 +116,7 @@ fun RegistrarCompromisoScreen(
                 leadingIcon = { Icon(Icons.Filled.AttachMoney, contentDescription = "Monto") },
                 isError = uiState.errorMontoCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorMontoCompromiso != null) {
@@ -132,7 +135,7 @@ fun RegistrarCompromisoScreen(
             OutlinedButton(
                 onClick = { mostrarDatePicker = true },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = EstilosCampo.forma
             ) {
                 Icon(Icons.Filled.DateRange, contentDescription = "Fecha")
                 Spacer(modifier = Modifier.width(8.dp))
@@ -176,7 +179,7 @@ fun RegistrarCompromisoScreen(
 
             Button(
                 onClick = { viewModel.onRegistrarCompromiso() },
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -195,3 +198,6 @@ fun RegistrarCompromisoScreen(
         }
     }
 }
+
+
+

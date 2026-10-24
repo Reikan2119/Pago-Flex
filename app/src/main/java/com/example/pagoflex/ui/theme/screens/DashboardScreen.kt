@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.Row
 import com.example.pagoflex.ui.components.AvatarIniciales
 import com.example.pagoflex.ui.components.InsigniaRol
 import com.example.pagoflex.ui.theme.colorDeRol
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -134,7 +137,7 @@ fun DashboardScreen(
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = EstilosTarjeta.forma,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -169,14 +172,14 @@ fun DashboardScreen(
                 Button(
                     onClick = onNavegarAReporte,
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = EstilosBoton.forma
                 ) {
                     Text(stringResource(R.string.btn_reportar), style = MaterialTheme.typography.labelMedium)
                 }
                 Button(
                     onClick = onNavegarARecomendar,
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = EstilosBoton.forma
                 ) {
                     Text(stringResource(R.string.btn_recomendar), style = MaterialTheme.typography.labelMedium)
                 }
@@ -184,7 +187,7 @@ fun DashboardScreen(
                     Button(
                         onClick = onNavegarARegistrarCompromiso,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = EstilosBoton.forma
                     ) {
                         Text(stringResource(R.string.btn_registrar), style = MaterialTheme.typography.labelMedium)
                     }
@@ -236,4 +239,7 @@ fun DashboardScreen(
     }
 }
 }
+
+
+
 

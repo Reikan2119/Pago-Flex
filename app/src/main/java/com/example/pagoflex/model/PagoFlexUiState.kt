@@ -14,9 +14,14 @@ data class PagoFlexUiState(
     val perfilNombre: String = "",
     val perfilCorreo: String = "",
     val perfilComuna: String = "",
+    val perfilRut: String = "",
 
     val nombreRegistro: String = "",
     val errorNombreRegistro: String? = null,
+    val rutRegistro: String = "",
+    val errorRutRegistro: String? = null,
+    val comunaRegistro: String = "",
+    val errorComunaRegistro: String? = null,
     val correoRegistro: String = "",
     val errorCorreoRegistro: String? = null,
     val contrasenaRegistro: String = "",
@@ -47,6 +52,9 @@ data class PagoFlexUiState(
     val comunaEntidadRecomendada: String = "",
     val errorComunaEntidad: String? = null,
     val recomendacionExitosa: Boolean = false,
+
+    val entidadesDisponibles: List<EntidadSugerida> = emptyList(),
+    val mostrarListaEntidades: Boolean = false,
 
     val compromisoSeleccionadoParaPago: Compromiso? = null,
 

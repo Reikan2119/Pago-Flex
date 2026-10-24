@@ -1,5 +1,9 @@
 package com.example.pagoflex.ui.screens
 
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +24,7 @@ fun CompromisoItemCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = EstilosTarjeta.forma,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
@@ -85,4 +89,8 @@ fun CompromisoItemCard(
         }
     }
 }
+
+
+
+
 

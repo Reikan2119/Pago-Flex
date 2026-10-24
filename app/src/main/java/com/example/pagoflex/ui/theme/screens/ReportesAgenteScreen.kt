@@ -9,6 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -104,5 +107,8 @@ private fun diasSinGestionar(fecha: String): Int {
         diff.toInt()
     } catch (e: Exception) { 0 }
 }
+
+
+
 
 

@@ -6,6 +6,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.Icons
@@ -14,6 +17,9 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,24 +54,32 @@ fun RecomendarEntidadScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedTextField(
-                value = uiState.nombreEntidadRecomendada,
-                onValueChange = { viewModel.onNombreEntidadCambia(it) },
-                label = { Text("Nombre de la Entidad") },
-                leadingIcon = { Icon(Icons.Filled.Business, contentDescription = "Entidad") },
-                isError = uiState.errorNombreEntidad != null,
+            var expandedLista by remember { mutableStateOf(false) }
+
+            OutlinedButton(
+                onClick = { viewModel.onMostrarListaEntidades(true) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true
-            )
-            if (uiState.errorNombreEntidad != null) {
-                Text(
-                    text = uiState.errorNombreEntidad!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, top = 4.dp)
+                shape = EstilosCampo.forma
+            ) {
+                Text(if (uiState.nombreEntidadRecomendada.isBlank()) "Buscar entidad (opcional)" else "Entidad: ${uiState.nombreEntidadRecomendada}")
+            }
+
+            if (uiState.mostrarListaEntidades) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.onMostrarListaEntidades(false) },
+                    title = { Text("Seleccionar entidad") },
+                    text = {
+                        Column {
+                            uiState.entidadesDisponibles.forEach { e ->
+                                TextButton(onClick = { viewModel.onSeleccionarEntidad(e) }, modifier = Modifier.fillMaxWidth()) {
+                                    Text("${e.nombre} - ${e.rubro} (${e.comuna})")
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { viewModel.onMostrarListaEntidades(false) }) { Text("Cerrar") }
+                    }
                 )
             }
 
@@ -78,7 +92,7 @@ fun RecomendarEntidadScreen(
                 leadingIcon = { Icon(Icons.Filled.Category, contentDescription = "Rubro") },
                 isError = uiState.errorRubroEntidad != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorRubroEntidad != null) {
@@ -101,7 +115,7 @@ fun RecomendarEntidadScreen(
                 leadingIcon = { Icon(Icons.Filled.LocationOn, contentDescription = "Comuna") },
                 isError = uiState.errorComunaEntidad != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorComunaEntidad != null) {
@@ -119,7 +133,7 @@ fun RecomendarEntidadScreen(
 
             Button(
                 onClick = { viewModel.onEnviarRecomendacion() },
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -138,3 +152,6 @@ fun RecomendarEntidadScreen(
         }
     }
 }
+
+
+

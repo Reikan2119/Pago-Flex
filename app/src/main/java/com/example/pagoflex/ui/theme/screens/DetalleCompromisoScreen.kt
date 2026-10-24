@@ -8,6 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pagoflex.model.Compromiso
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -58,11 +61,14 @@ fun DetalleCompromisoScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
             if (compromiso.idEstadoCompromiso != 3) {
-                Button(onClick = onPagar, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(12.dp)) {
+                Button(onClick = onPagar, modifier = Modifier.fillMaxWidth().height(50.dp), shape = EstilosCampo.forma) {
                     Text("Pagar")
                 }
             }
         }
     }
 }
+
+
+
 

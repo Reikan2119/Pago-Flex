@@ -13,6 +13,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +72,7 @@ fun ReporteProblemaScreen(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = EstilosCampo.forma
                 )
 
                 ExposedDropdownMenu(
@@ -100,7 +103,7 @@ fun ReporteProblemaScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = EstilosCampo.forma
             )
             if (uiState.errorComentarioReporte != null) {
                 Text(
@@ -120,7 +123,7 @@ fun ReporteProblemaScreen(
             OutlinedButton(
                 onClick = { lanzadorFoto.launch("image/*") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = EstilosCampo.forma
             ) {
                 Text(if (fotoUri == null) "Adjuntar foto (opcional)" else "Foto seleccionada")
             }
@@ -136,7 +139,7 @@ fun ReporteProblemaScreen(
 
             Button(
                 onClick = { viewModel.onEnviarReporte() },
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -155,3 +158,6 @@ fun ReporteProblemaScreen(
         }
     }
 }
+
+
+

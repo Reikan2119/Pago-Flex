@@ -1,5 +1,9 @@
 package com.example.pagoflex.ui.screens
 
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -45,7 +49,7 @@ fun BienvenidaScreen(
 
             Button(
                 onClick = onNavegarALogin,
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -57,7 +61,7 @@ fun BienvenidaScreen(
 
             OutlinedButton(
                 onClick = onNavegarARegistro,
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -67,3 +71,7 @@ fun BienvenidaScreen(
         }
     }
 }
+
+
+
+

@@ -28,6 +28,9 @@ import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +86,7 @@ fun PagoScreen(
                         viewModel.limpiarPagoTarjeta()
                         onVolver()
                     },
-                    shape = RoundedCornerShape(12.dp),
+                    shape = EstilosCampo.forma,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Volver")
@@ -93,7 +96,7 @@ fun PagoScreen(
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = EstilosTarjeta.forma,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
@@ -126,7 +129,7 @@ fun PagoScreen(
                 isError = uiState.errorNumeroTarjeta != null,
                 leadingIcon = { Icon(Icons.Filled.CreditCard, contentDescription = "Tarjeta") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorNumeroTarjeta != null) {
@@ -147,7 +150,7 @@ fun PagoScreen(
                 isError = uiState.errorNombreTitularTarjeta != null,
                 leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Titular") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorNombreTitularTarjeta != null) {
@@ -168,7 +171,7 @@ fun PagoScreen(
                 OutlinedButton(
                     onClick = { mostrarDatePicker = true },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = EstilosCampo.forma
                 ) {
                     Icon(Icons.Filled.DateRange, contentDescription = "Fecha")
                     Spacer(modifier = Modifier.width(8.dp))
@@ -187,7 +190,7 @@ fun PagoScreen(
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "CVV") },
                     visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = EstilosCampo.forma,
                     singleLine = true
                 )
             }
@@ -233,7 +236,7 @@ fun PagoScreen(
 
             Button(
                 onClick = { viewModel.onRealizarPagoTarjeta() },
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
                 Text(text = "Pagar", style = MaterialTheme.typography.titleMedium)
@@ -252,7 +255,7 @@ fun PagoScreen(
                         viewModel.limpiarPagoTarjeta()
                         onVolver()
                     },
-                    shape = RoundedCornerShape(12.dp),
+                    shape = EstilosCampo.forma,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Volver al Dashboard")
@@ -268,3 +271,6 @@ fun PagoScreen(
         }
     }
 }
+
+
+

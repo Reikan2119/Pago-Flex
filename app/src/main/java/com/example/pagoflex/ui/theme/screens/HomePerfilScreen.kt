@@ -19,6 +19,9 @@ import com.example.pagoflex.ui.components.AvatarIniciales
 import com.example.pagoflex.ui.components.InsigniaRol
 import com.example.pagoflex.ui.components.TarjetaSeccion
 import com.example.pagoflex.ui.theme.colorDeRol
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,6 +98,7 @@ fun HomePerfilScreen(
                         titulo = "Datos personales",
                         campos = listOf(
                             CampoVisible("ID de usuario", uiState.idUsuarioLogueado.toString()),
+                            CampoVisible("RUT", uiState.perfilRut.ifBlank { "No registrado" }),
                             CampoVisible("Rol", rol.etiqueta),
                             CampoVisible("Correo", uiState.perfilCorreo.ifBlank { uiState.correoLogin }),
                             CampoVisible("Comuna", uiState.perfilComuna.ifBlank { "No registrada" })
@@ -105,5 +109,8 @@ fun HomePerfilScreen(
         }
     }
 }
+
+
+
 
 

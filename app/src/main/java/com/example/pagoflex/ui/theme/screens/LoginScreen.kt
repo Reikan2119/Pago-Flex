@@ -12,12 +12,18 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.pagoflex.viewmodel.PagoFlexViewModel
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.viewmodel.AuthViewModel
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.estiloAltoBoton
+import androidx.compose.ui.res.stringResource
+import com.example.pagoflex.R
+import com.example.pagoflex.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginSimuladoScreen(
-    viewModel: PagoFlexViewModel,
+    viewModel: AuthViewModel,
     onLoginSuccess: () -> Unit,
     onVolver: () -> Unit
 ) {
@@ -40,7 +46,7 @@ fun LoginSimuladoScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Bienvenido de nuevo",
+                text = stringResource(R.string.bienvenido),
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.primary
             )
@@ -54,7 +60,8 @@ fun LoginSimuladoScreen(
                 leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Correo") },
                 isError = uiState.errorCorreoLogin != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
+                colors = EstilosCampo.colores(),
                 singleLine = true
             )
             if (uiState.errorCorreoLogin != null) {
@@ -76,7 +83,8 @@ fun LoginSimuladoScreen(
                 isError = uiState.errorContrasenaLogin != null,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
+                colors = EstilosCampo.colores(),
                 singleLine = true
             )
             if (uiState.errorContrasenaLogin != null) {
@@ -95,12 +103,19 @@ fun LoginSimuladoScreen(
                     val exito = viewModel.onIntentarLogin()
                     if (exito) onLoginSuccess()
                 },
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().height(50.dp)
+                shape = EstilosBoton.forma,
+                colors = EstilosBoton.coloresPrincipal(),
+                elevation = EstilosBoton.elevacion(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .estiloAltoBoton()
             ) {
-                Text(text = "Ingresar", style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(R.string.ingresar), style = MaterialTheme.typography.titleMedium)
             }
         }
     }
 }
+
+
+
 

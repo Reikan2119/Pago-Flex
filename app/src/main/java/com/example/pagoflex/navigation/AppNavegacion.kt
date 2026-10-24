@@ -23,6 +23,7 @@ import com.example.pagoflex.ui.screens.RecomendarEntidadScreen
 import com.example.pagoflex.ui.screens.RegistroScreen
 import com.example.pagoflex.ui.screens.ReporteProblemaScreen
 import com.example.pagoflex.ui.screens.RegistrarCompromisoScreen
+import com.example.pagoflex.viewmodel.AuthViewModel
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 
@@ -31,6 +32,7 @@ fun AppNavegacion() {
     val navController = rememberNavController()
 
     val viewModel: PagoFlexViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -46,10 +48,11 @@ fun AppNavegacion() {
 
         composable(Ruta.Login.ruta) {
             LoginSimuladoScreen(
-                viewModel = viewModel,
+                viewModel = authViewModel,
                 onLoginSuccess = {
-                    val rol = viewModel.uiState.value.rolSeleccionado
-                    val destino = if (rol == RolUsuario.AGENTE) Ruta.AgenteHome.ruta else Ruta.HomePerfil.ruta
+                    val u = authViewModel.uiState.value
+                    viewModel.iniciarSesion(u.idUsuarioLogueado, u.nombreLogin, u.perfilCorreo, u.rolSeleccionado ?: RolUsuario.USUARIO_FINAL)
+                    val destino = if (u.rolSeleccionado == RolUsuario.AGENTE) Ruta.AgenteHome.ruta else Ruta.HomePerfil.ruta
                     navController.navigate(destino) {
                         popUpTo(Ruta.Bienvenida.ruta) { inclusive = true }
                     }
@@ -60,10 +63,10 @@ fun AppNavegacion() {
 
         composable(Ruta.Registro.ruta) {
             RegistroScreen(
-                viewModel = viewModel,
+                viewModel = authViewModel,
                 onRegistroSuccess = {
-                    navController.navigate(Ruta.Dashboard.ruta) {
-                        popUpTo(Ruta.Bienvenida.ruta) { inclusive = true }
+                    navController.navigate(Ruta.Bienvenida.ruta) {
+                        popUpTo(Ruta.Registro.ruta) { inclusive = true }
                     }
                 },
                 onVolver = { navController.navigateUp() }

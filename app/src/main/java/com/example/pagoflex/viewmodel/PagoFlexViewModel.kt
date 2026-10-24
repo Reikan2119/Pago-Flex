@@ -14,6 +14,7 @@ import com.example.pagoflex.data.repository.UsuarioRepository
 import com.example.pagoflex.model.Recomendacion
 import com.example.pagoflex.model.ReporteProblema
 import com.example.pagoflex.model.Compromiso
+import com.example.pagoflex.model.EntidadSugerida
 import com.example.pagoflex.model.PagoFlexUiState
 import com.example.pagoflex.model.RolUsuario
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class PagoFlexViewModel(application: Application) : AndroidViewModel(application) {
+    private val _uiState = MutableStateFlow(PagoFlexUiState())
+    init {
+        _uiState.update {
+            it.copy(
+                entidadesDisponibles = listOf(
+                    EntidadSugerida("Municipalidad de Santiago", "Municipalidad", "Santiago"),
+                    EntidadSugerida("Club Deportivo Universidad", "Club", "Providencia"),
+                    EntidadSugerida("Colegio San Ignacio", "Educaci�n", "Las Condes"),
+                    EntidadSugerida("Inmobiliaria Altos del Maipo", "Inmobiliaria", "Puente Alto")
+                )
+            )
+        }
+    }
 
     private val dbHelper = PagoFlexDbHelper(application)
     private val compromisoRepository = CompromisoRepository(dbHelper)
@@ -30,7 +44,6 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
     private val usuarioRepository = UsuarioRepository(dbHelper)
     private val reporteGestionRepository = ReporteGestionRepository(dbHelper)
     private val recomendacionGestionRepository = RecomendacionGestionRepository(dbHelper)
-    private val _uiState = MutableStateFlow(PagoFlexUiState())
     val uiState: StateFlow<PagoFlexUiState> = _uiState.asStateFlow()
 
     fun onNombreLoginCambia(nombre: String) {
@@ -79,6 +92,8 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 nombreLogin = usuario.nombre,
                 perfilNombre = usuario.nombre,
                 perfilCorreo = usuario.correo,
+                perfilRut = usuario.rut ?: "",
+                perfilComuna = usuario.comuna ?: "",
                 rolSeleccionado = rol,
                 compromisos = compromisoRepository.obtenerTodos()
             )
@@ -100,6 +115,13 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
         _uiState.update { it.copy(contrasenaRegistro = contrasena, errorContrasenaRegistro = null) }
     }
 
+    fun onRutRegistroCambia(rut: String) {
+        _uiState.update { it.copy(rutRegistro = rut, errorRutRegistro = null) }
+    }
+
+    fun onComunaRegistroCambia(comuna: String) {
+        _uiState.update { it.copy(comunaRegistro = comuna, errorComunaRegistro = null) }
+    }
     fun onRegistrarUsuario(): Boolean {
         val estado = _uiState.value
         val regexSoloLetras = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")
@@ -112,33 +134,51 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
         }
         val errorCorreo = if (estado.correoRegistro.isBlank() || !estado.correoRegistro.contains("@")) "Ingresa un correo válido" else null
         val errorContrasena = if (estado.contrasenaRegistro.length < 6) "Mínimo 6 caracteres" else null
+        val errorRut = if (estado.rutRegistro.isBlank()) "El RUT es obligatorio" else null
+        val errorComuna = if (estado.comunaRegistro.isBlank()) "La comuna es obligatoria" else null
 
-        if (errorNombre != null || errorCorreo != null || errorContrasena != null) {
+        if (errorNombre != null || errorCorreo != null || errorContrasena != null || errorRut != null || errorComuna != null) {
             _uiState.update {
                 it.copy(
                     errorNombreRegistro = errorNombre,
                     errorCorreoRegistro = errorCorreo,
                     errorContrasenaRegistro = errorContrasena,
+                    errorRutRegistro = errorRut,
+                    errorComunaRegistro = errorComuna,
                     registroUsuarioExitoso = false
                 )
             }
             return false
         }
-        usuarioRepository.registrar(estado.nombreRegistro, estado.correoRegistro, estado.contrasenaRegistro)
+        usuarioRepository.registrar(estado.nombreRegistro, estado.correoRegistro, estado.contrasenaRegistro, estado.rutRegistro, estado.comunaRegistro)
 
         _uiState.update {
             it.copy(
                 nombreRegistro = "",
                 correoRegistro = "",
                 contrasenaRegistro = "",
+                rutRegistro = "",
+                comunaRegistro = "",
                 registroUsuarioExitoso = true
             )
         }
         return true
     }
 
-    fun cerrarSesion() {
-        _uiState.update { PagoFlexUiState() }
+    fun cerrarSesion() { _uiState.value = PagoFlexUiState() }
+
+    fun iniciarSesion(id: Int, nombre: String, correo: String, rol: RolUsuario) {
+        _uiState.update {
+            it.copy(
+                sesionIniciada = true,
+                idUsuarioLogueado = id,
+                nombreLogin = nombre,
+                perfilNombre = nombre,
+                perfilCorreo = correo,
+                rolSeleccionado = rol,
+                compromisos = compromisoRepository.obtenerTodos()
+            )
+        }
     }
 
     fun onPagarCompromiso(compromiso: Compromiso) {
@@ -447,6 +487,9 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
     }
 
 
+    fun onPerfilRutCambia(valor: String) {
+        _uiState.update { it.copy(perfilRut = valor) }
+    }
     fun onPerfilNombreCambia(valor: String) {
         _uiState.update { it.copy(perfilNombre = valor) }
     }
@@ -462,7 +505,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
     fun onGuardarPerfil() {
         val estado = _uiState.value
         if (estado.idUsuarioLogueado != 0) {
-            usuarioRepository.actualizarPerfil(estado.idUsuarioLogueado, estado.perfilNombre, estado.perfilCorreo, estado.perfilComuna)
+            usuarioRepository.actualizarPerfil(estado.idUsuarioLogueado, estado.perfilNombre, estado.perfilCorreo, estado.perfilComuna, estado.perfilRut)
         }
         _uiState.update { it.copy(nombreLogin = estado.perfilNombre, perfilCorreo = estado.perfilCorreo) }
     }
@@ -533,7 +576,30 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
     fun cambiarEstadoRecomendacion(id: Int, estado: String) {
         recomendacionGestionRepository.cambiarEstado(id, estado)
         cargarRecomendacionesAgente()
+    }
+    fun onMostrarListaEntidades(mostrar: Boolean) {
+        _uiState.update { it.copy(mostrarListaEntidades = mostrar) }
+    }
+
+    fun onSeleccionarEntidad(entidad: EntidadSugerida) {
+        _uiState.update {
+            it.copy(
+                nombreEntidadRecomendada = entidad.nombre,
+                rubroEntidadRecomendada = entidad.rubro,
+                comunaEntidadRecomendada = entidad.comuna,
+                mostrarListaEntidades = false
+            )
+        }
     }}
+
+
+
+
+
+
+
+
+
 
 
 

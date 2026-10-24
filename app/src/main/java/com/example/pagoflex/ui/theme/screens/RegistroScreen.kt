@@ -15,12 +15,15 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.pagoflex.viewmodel.PagoFlexViewModel
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
+import com.example.pagoflex.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroScreen(
-    viewModel: PagoFlexViewModel,
+    viewModel: AuthViewModel,
     onRegistroSuccess: () -> Unit,
     onVolver: () -> Unit
 ) {
@@ -57,7 +60,7 @@ fun RegistroScreen(
                 leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Nombre") },
                 isError = uiState.errorNombreRegistro != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorNombreRegistro != null) {
@@ -74,13 +77,55 @@ fun RegistroScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
+                value = uiState.rutRegistro,
+                onValueChange = { viewModel.onRutRegistroCambia(it) },
+                label = { Text("RUT") },
+                isError = uiState.errorRutRegistro != null,
+                modifier = Modifier.fillMaxWidth(),
+                shape = EstilosCampo.forma,
+                colors = EstilosCampo.colores(),
+                singleLine = true
+            )
+            if (uiState.errorRutRegistro != null) {
+                Text(
+                    text = uiState.errorRutRegistro!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = uiState.comunaRegistro,
+                onValueChange = { viewModel.onComunaRegistroCambia(it) },
+                label = { Text("Comuna") },
+                isError = uiState.errorComunaRegistro != null,
+                modifier = Modifier.fillMaxWidth(),
+                shape = EstilosCampo.forma,
+                colors = EstilosCampo.colores(),
+                singleLine = true
+            )
+            if (uiState.errorComunaRegistro != null) {
+                Text(
+                    text = uiState.errorComunaRegistro!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
                 value = uiState.correoRegistro,
                 onValueChange = { viewModel.onCorreoRegistroCambia(it) },
                 label = { Text("Correo Electrónico") },
                 leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Correo") },
                 isError = uiState.errorCorreoRegistro != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorCorreoRegistro != null) {
@@ -104,7 +149,7 @@ fun RegistroScreen(
                 leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Contraseña") },
                 isError = uiState.errorContrasenaRegistro != null,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
             if (uiState.errorContrasenaRegistro != null) {
@@ -127,7 +172,7 @@ fun RegistroScreen(
                         // mensaje ya se muestra por estado; volver después de un pequeño delay no es posible sin coroutine, así que mostramos mensaje y permitimos volver
                     }
                 },
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -150,3 +195,7 @@ fun RegistroScreen(
         }
     }
 }
+
+
+
+

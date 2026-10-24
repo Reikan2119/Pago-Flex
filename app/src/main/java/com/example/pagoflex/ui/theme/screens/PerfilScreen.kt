@@ -8,6 +8,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.pagoflex.ui.style.EstilosBoton
+import com.example.pagoflex.ui.style.EstilosCampo
+import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,11 +43,23 @@ fun PerfilScreen(
             )
 
             OutlinedTextField(
+                value = uiState.perfilRut,
+                onValueChange = { viewModel.onPerfilRutCambia(it) },
+                label = { Text("RUT") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = EstilosCampo.forma,
+                colors = EstilosCampo.colores(),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
                 value = uiState.perfilNombre,
                 onValueChange = { viewModel.onPerfilNombreCambia(it) },
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
 
@@ -53,7 +68,7 @@ fun PerfilScreen(
                 onValueChange = { viewModel.onPerfilCorreoCambia(it) },
                 label = { Text("Correo") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
 
@@ -62,13 +77,13 @@ fun PerfilScreen(
                 onValueChange = { viewModel.onPerfilComunaCambia(it) },
                 label = { Text("Comuna") },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 singleLine = true
             )
 
             Button(
                 onClick = { viewModel.onGuardarPerfil() },
-                shape = RoundedCornerShape(12.dp),
+                shape = EstilosCampo.forma,
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
                 Text("Guardar cambios", style = MaterialTheme.typography.titleMedium)
@@ -76,4 +91,7 @@ fun PerfilScreen(
         }
     }
 }
+
+
+
 
