@@ -13,6 +13,7 @@ import com.example.pagoflex.data.repository.ReporteRepository
 import com.example.pagoflex.data.repository.UsuarioRepository
 import com.example.pagoflex.model.Recomendacion
 import com.example.pagoflex.model.ReporteProblema
+import com.example.pagoflex.model.Cliente
 import com.example.pagoflex.model.Compromiso
 import com.example.pagoflex.model.EntidadSugerida
 import com.example.pagoflex.model.PagoFlexUiState
@@ -38,192 +39,16 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
     }
 
     private val dbHelper = PagoFlexDbHelper(application)
+    private val usuarioRepository = UsuarioRepository(dbHelper)
     private val compromisoRepository = CompromisoRepository(dbHelper)
     private val reporteRepository = ReporteRepository(dbHelper)
     private val recomendacionRepository = RecomendacionRepository(dbHelper)
-    private val usuarioRepository = UsuarioRepository(dbHelper)
     private val reporteGestionRepository = ReporteGestionRepository(dbHelper)
     private val recomendacionGestionRepository = RecomendacionGestionRepository(dbHelper)
     val uiState: StateFlow<PagoFlexUiState> = _uiState.asStateFlow()
 
-    fun onNombreLoginCambia(nombre: String) {
-        val error = if (nombre.any { it.isDigit() }) "El nombre no puede contener números." else null
-        _uiState.update { it.copy(nombreLogin = nombre, errorNombreLogin = error) }
-    }
+    init { cargarClientes() }
 
-    fun onCorreoLoginCambia(correo: String) {
-        _uiState.update { it.copy(correoLogin = correo, errorCorreoLogin = null) }
-    }
-
-    fun onContrasenaLoginCambia(contrasena: String) {
-        _uiState.update { it.copy(contrasenaLogin = contrasena, errorContrasenaLogin = null) }
-    }
-
-    fun onRolCambia(rol: RolUsuario) {
-        _uiState.update { it.copy(rolSeleccionado = rol, errorRolLogin = null) }
-    }
-
-    fun onIntentarLogin(): Boolean {
-        val estado = _uiState.value
-        val errorCorreo = if (estado.correoLogin.isBlank() || !estado.correoLogin.contains("@")) "Ingresa un correo v�lido" else null
-        val errorContrasena = if (estado.contrasenaLogin.isBlank()) "La contrase�a es obligatoria" else null
-
-        if (errorCorreo != null || errorContrasena != null) {
-            _uiState.update { it.copy(errorCorreoLogin = errorCorreo, errorContrasenaLogin = errorContrasena) }
-            return false
-        }
-
-        val usuario = usuarioRepository.login(estado.correoLogin, estado.contrasenaLogin)
-        if (usuario == null) {
-            _uiState.update { it.copy(errorContrasenaLogin = "Correo o contrase�a incorrectos") }
-            return false
-        }
-
-        val rol = when (usuario.idRol) {
-            2 -> RolUsuario.AGENTE
-            3 -> RolUsuario.EJECUTIVO
-            else -> RolUsuario.USUARIO_FINAL
-        }
-
-        _uiState.update {
-            it.copy(
-                sesionIniciada = true,
-                idUsuarioLogueado = usuario.id,
-                nombreLogin = usuario.nombre,
-                perfilNombre = usuario.nombre,
-                perfilCorreo = usuario.correo,
-                perfilRut = usuario.rut ?: "",
-                perfilComuna = usuario.comuna ?: "",
-                rolSeleccionado = rol,
-                compromisos = compromisoRepository.obtenerTodos()
-            )
-        }
-        return true
-    }
-
-    // --- REGISTRO DE USUARIO ---
-    fun onNombreRegistroCambia(nombre: String) {
-        val error = if (nombre.any { it.isDigit() }) "El nombre no puede contener números." else null
-        _uiState.update { it.copy(nombreRegistro = nombre, errorNombreRegistro = error) }
-    }
-
-    fun onCorreoRegistroCambia(correo: String) {
-        _uiState.update { it.copy(correoRegistro = correo, errorCorreoRegistro = null) }
-    }
-
-    fun onContrasenaRegistroCambia(contrasena: String) {
-        _uiState.update { it.copy(contrasenaRegistro = contrasena, errorContrasenaRegistro = null) }
-    }
-
-    fun onRutRegistroCambia(rut: String) {
-        _uiState.update { it.copy(rutRegistro = rut, errorRutRegistro = null) }
-    }
-
-    fun onComunaRegistroCambia(comuna: String) {
-        _uiState.update { it.copy(comunaRegistro = comuna, errorComunaRegistro = null) }
-    }
-    fun onRegistrarUsuario(): Boolean {
-        val estado = _uiState.value
-        val regexSoloLetras = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")
-        val errorNombre = when {
-            estado.nombreRegistro.isBlank() -> "El nombre es obligatorio"
-            estado.nombreRegistro.trim().length < 2 -> "El nombre debe tener al menos 2 caracteres."
-            estado.nombreRegistro.any { it.isDigit() } -> "El nombre no puede contener números."
-            !estado.nombreRegistro.matches(regexSoloLetras) -> "El nombre solo puede contener letras."
-            else -> null
-        }
-        val errorCorreo = if (estado.correoRegistro.isBlank() || !estado.correoRegistro.contains("@")) "Ingresa un correo válido" else null
-        val errorContrasena = if (estado.contrasenaRegistro.length < 6) "Mínimo 6 caracteres" else null
-        val errorRut = if (estado.rutRegistro.isBlank()) "El RUT es obligatorio" else null
-        val errorComuna = if (estado.comunaRegistro.isBlank()) "La comuna es obligatoria" else null
-
-        if (errorNombre != null || errorCorreo != null || errorContrasena != null || errorRut != null || errorComuna != null) {
-            _uiState.update {
-                it.copy(
-                    errorNombreRegistro = errorNombre,
-                    errorCorreoRegistro = errorCorreo,
-                    errorContrasenaRegistro = errorContrasena,
-                    errorRutRegistro = errorRut,
-                    errorComunaRegistro = errorComuna,
-                    registroUsuarioExitoso = false
-                )
-            }
-            return false
-        }
-        usuarioRepository.registrar(estado.nombreRegistro, estado.correoRegistro, estado.contrasenaRegistro, estado.rutRegistro, estado.comunaRegistro)
-
-        _uiState.update {
-            it.copy(
-                nombreRegistro = "",
-                correoRegistro = "",
-                contrasenaRegistro = "",
-                rutRegistro = "",
-                comunaRegistro = "",
-                registroUsuarioExitoso = true
-            )
-        }
-        return true
-    }
-
-    fun cerrarSesion() { _uiState.value = PagoFlexUiState() }
-
-    fun iniciarSesion(id: Int, nombre: String, correo: String, rol: RolUsuario) {
-        _uiState.update {
-            it.copy(
-                sesionIniciada = true,
-                idUsuarioLogueado = id,
-                nombreLogin = nombre,
-                perfilNombre = nombre,
-                perfilCorreo = correo,
-                rolSeleccionado = rol,
-                compromisos = compromisoRepository.obtenerTodos()
-            )
-        }
-    }
-
-    fun onPagarCompromiso(compromiso: Compromiso) {
-        compromisoRepository.marcarPagado(compromiso.idCompromiso)
-        _uiState.update { estadoActual ->
-            val listaActualizada = estadoActual.compromisos.map {
-                if (it.idCompromiso == compromiso.idCompromiso) {
-                    it.copy(idEstadoCompromiso = 3)
-                } else {
-                    it
-                }
-            }
-            estadoActual.copy(compromisos = listaActualizada)
-        }
-    }
-
-    fun onMotivoReporteCambia(motivo: String) {
-        _uiState.update { it.copy(motivoReporteSeleccionado = motivo, errorComentarioReporte = null) }
-    }
-
-    fun onComentarioReporteCambia(comentario: String) {
-        _uiState.update { it.copy(comentarioReporte = comentario, errorComentarioReporte = null) }
-    }
-
-    fun onEnviarReporte() {
-        val estado = _uiState.value
-        val error = if (estado.motivoReporteSeleccionado == "Otro" && estado.comentarioReporte.isBlank()) {
-            "El comentario es obligatorio cuando el motivo es 'Otro' "
-        } else null
-
-        if (error != null) {
-            _uiState.update { it.copy(errorComentarioReporte = error, reporteExitoso = false) }
-        } else {
-            reporteRepository.insertar(estado.motivoReporteSeleccionado, estado.comentarioReporte)
-
-            _uiState.update {
-                it.copy(
-                    errorComentarioReporte = null,
-                    reporteExitoso = true,
-                    comentarioReporte = "",
-                    motivoReporteSeleccionado = "Pago no reflejado"
-                )
-            }
-        }
-    }
     fun onRutClienteCompromisoCambia(valor: String) {
         _uiState.update { it.copy(rutClienteCompromiso = valor, errorRutClienteCompromiso = null) }
     }
@@ -265,10 +90,14 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 )
             }
         } else {
+            val idCliente = estado.clienteSeleccionado?.id
+                ?: usuarioRepository.obtenerUsuariosFinales().firstOrNull { it.rut == estado.rutClienteCompromiso }?.id
+                ?: 1
+
             val nuevoCompromiso = Compromiso(
                 idCompromiso = (100..999).random(),
                 folio = "CP-2026-${(1000..9999).random()}",
-                idUsuarioFinal = 1,
+                idUsuarioFinal = idCliente,
                 idEmpresa = 1,
                 concepto = estado.conceptoCompromiso,
                 cuota = "1/1",
@@ -446,7 +275,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
 
         if (compromiso != null) {
             onPagarCompromiso(compromiso)
-            compromisoRepository.insertarComprobante(compromiso.idCompromiso, compromiso.monto, compromiso.folio)
+            compromisoRepository.insertarComprobante(compromiso.idCompromiso, compromiso.totalAPagar(), compromiso.folio)
         }
 
         _uiState.update {
@@ -457,7 +286,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 errorFechaExpiracionTarjeta = null,
                 pagoTarjetaExitoso = true,
                 comprobanteFecha = java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(java.util.Date()),
-                comprobanteMonto = compromiso?.monto ?: 0,
+                comprobanteMonto = compromiso?.totalAPagar() ?: 0,
                 comprobanteFolio = compromiso?.folio ?: "",
                 mostrarComprobante = true,
                 numeroTarjeta = "",
@@ -507,7 +336,7 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
         if (estado.idUsuarioLogueado != 0) {
             usuarioRepository.actualizarPerfil(estado.idUsuarioLogueado, estado.perfilNombre, estado.perfilCorreo, estado.perfilComuna, estado.perfilRut)
         }
-        _uiState.update { it.copy(nombreLogin = estado.perfilNombre, perfilCorreo = estado.perfilCorreo) }
+        _uiState.update { it.copy(nombreLogin = estado.perfilNombre, perfilCorreo = estado.perfilCorreo, perfilRut = estado.perfilRut, perfilComuna = estado.perfilComuna, perfilGuardadoExitoso = true) }
     }
     fun cargarReportesAgente() {
         val reportes = reporteGestionRepository.obtenerTodos().map { r ->
@@ -590,13 +419,96 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
                 mostrarListaEntidades = false
             )
         }
+}
+
+    fun onPagarCompromiso(compromiso: Compromiso) {
+        compromisoRepository.marcarPagado(compromiso.idCompromiso)
+        _uiState.update { estadoActual ->
+            val listaActualizada = estadoActual.compromisos.map {
+                if (it.idCompromiso == compromiso.idCompromiso) it.copy(idEstadoCompromiso = 3) else it
+            }
+            estadoActual.copy(compromisos = listaActualizada)
+        }
+    }
+    fun iniciarSesion(id: Int, nombre: String, correo: String, rut: String?, comuna: String?, rol: RolUsuario) {
+        _uiState.update {
+            it.copy(
+                sesionIniciada = true,
+                idUsuarioLogueado = id,
+                nombreLogin = nombre,
+                perfilNombre = nombre,
+                perfilCorreo = correo,
+                perfilRut = rut ?: "",
+                perfilComuna = comuna ?: "",
+                rolSeleccionado = rol,
+                compromisos = compromisoRepository.obtenerPorUsuario(id)
+            )
+        }
+    }
+    fun cerrarSesion() {
+        _uiState.value = PagoFlexUiState()
+    }
+    fun onMotivoReporteCambia(motivo: String) {
+        _uiState.update { it.copy(motivoReporteSeleccionado = motivo, errorComentarioReporte = null) }
+    }
+
+    fun onComentarioReporteCambia(comentario: String) {
+        _uiState.update { it.copy(comentarioReporte = comentario, errorComentarioReporte = null) }
+    }
+
+    fun onEnviarReporte() {
+        val estado = _uiState.value
+        val error = if (estado.motivoReporteSeleccionado == "Otro" && estado.comentarioReporte.isBlank()) {
+            "El comentario es obligatorio cuando el motivo es 'Otro' "
+        } else null
+        if (error != null) {
+            _uiState.update { it.copy(errorComentarioReporte = error, reporteExitoso = false) }
+        } else {
+            reporteRepository.insertar(estado.motivoReporteSeleccionado, estado.comentarioReporte, if (estado.idUsuarioLogueado != 0) estado.idUsuarioLogueado else 1)
+            _uiState.update {
+                it.copy(
+                    errorComentarioReporte = null,
+                    reporteExitoso = true,
+                    comentarioReporte = "",
+                    motivoReporteSeleccionado = "Pago no reflejado"
+                )
+            }
+        }
+    }
+    fun cargarClientes() {
+        val clientes = usuarioRepository.obtenerUsuariosFinales().map { u ->
+            Cliente(id = u.id, nombre = u.nombre, rut = u.rut ?: "")
+        }
+        _uiState.update { it.copy(clientesDisponibles = clientes) }
+    }
+
+    fun onMostrarListaClientes(mostrar: Boolean) {
+        _uiState.update { it.copy(mostrarListaClientes = mostrar) }
+    }
+
+    fun onSeleccionarCliente(cliente: Cliente) {
+        _uiState.update { it.copy(clienteSeleccionado = cliente, mostrarListaClientes = false, confirmarCliente = true) }
+    }
+
+    fun onConfirmarCliente() {
+        val c = _uiState.value.clienteSeleccionado
+        if (c != null) {
+            _uiState.update { it.copy(rutClienteCompromiso = c.rut, confirmarCliente = false) }
+        }
+    }
+
+    fun onCancelarCliente() {
+        _uiState.update { it.copy(clienteSeleccionado = null, confirmarCliente = false) }
+    }
+    fun limpiarMensajePerfil() {
+        _uiState.update { it.copy(perfilGuardadoExitoso = false) }
+    }
+    fun cargarReportesUsuario() {
+        val id = _uiState.value.idUsuarioLogueado
+        if (id != 0) {
+            _uiState.update { it.copy(reportesUsuario = reporteRepository.obtenerPorUsuario(id)) }
+        }
     }}
-
-
-
-
-
-
 
 
 

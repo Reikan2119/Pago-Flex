@@ -4,9 +4,9 @@ import android.content.ContentValues
 import com.example.pagoflex.data.PagoFlexDbHelper
 import com.example.pagoflex.model.Compromiso
 
-class CompromisoRepository(private val dbHelper: PagoFlexDbHelper) {
+class CompromisoRepository(private val dbHelper: PagoFlexDbHelper) : RepositorioBase<Compromiso> {
 
-    fun obtenerTodos(): List<Compromiso> {
+    override fun obtenerTodos(): List<Compromiso> {
         val db = dbHelper.readableDatabase
         val cursor = db.rawQuery(
             "SELECT id_compromiso, folio, id_usuario_final, id_empresa, concepto, cuota, monto, fecha_vencimiento, id_estado_compromiso FROM compromiso",
@@ -40,6 +40,9 @@ class CompromisoRepository(private val dbHelper: PagoFlexDbHelper) {
         return lista
     }
 
+    fun obtenerPorUsuario(idUsuario: Int): List<Compromiso> =
+        obtenerTodos().filter { it.idUsuarioFinal == idUsuario }
+
     fun insertar(compromiso: Compromiso) {
         val db = dbHelper.writableDatabase
         val values = ContentValues().apply {
@@ -55,6 +58,12 @@ class CompromisoRepository(private val dbHelper: PagoFlexDbHelper) {
         db.insert("compromiso", null, values)
     }
 
+    fun marcarPagado(idCompromiso: Int) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply { put("id_estado_compromiso", 3) }
+        db.update("compromiso", values, "id_compromiso=?", arrayOf(idCompromiso.toString()))
+    }
+
     fun insertarComprobante(idCompromiso: Int, monto: Int, folio: String) {
         val db = dbHelper.writableDatabase
         val values = ContentValues().apply {
@@ -66,9 +75,8 @@ class CompromisoRepository(private val dbHelper: PagoFlexDbHelper) {
         db.insert("comprobante", null, values)
     }
 
-    fun marcarPagado(idCompromiso: Int) {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply { put("id_estado_compromiso", 3) }
-        db.update("compromiso", values, "id_compromiso=?", arrayOf(idCompromiso.toString()))
+    fun obtenerComprobante(idCompromiso: Int): android.database.Cursor {
+        val db = dbHelper.readableDatabase
+        return db.rawQuery("SELECT fecha_pago, monto, folio FROM comprobante WHERE id_compromiso=? ORDER BY id_comprobante DESC LIMIT 1", arrayOf(idCompromiso.toString()))
     }
 }

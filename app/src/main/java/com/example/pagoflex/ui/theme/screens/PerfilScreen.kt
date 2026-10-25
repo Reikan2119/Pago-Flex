@@ -3,6 +3,8 @@ package com.example.pagoflex.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +27,7 @@ fun PerfilScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Mi Perfil - PagoFlex") },
+            navigationIcon = { IconButton(onClick = onVolver) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 
             )
         }
@@ -88,9 +91,19 @@ fun PerfilScreen(
             ) {
                 Text("Guardar cambios", style = MaterialTheme.typography.titleMedium)
             }
+
+            if (uiState.perfilGuardadoExitoso) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Perfil actualizado con éxito.",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
         }
     }
 }
+
 
 
 

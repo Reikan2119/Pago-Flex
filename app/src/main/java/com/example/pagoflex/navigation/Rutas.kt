@@ -6,6 +6,7 @@ sealed class Ruta(val ruta: String) {
     data object AgenteHome : Ruta("agente_home")
     data object Pagar : Ruta("pagar")
     data object HistorialPagos : Ruta("historial_pagos")
+    data object MisReportes : Ruta("mis_reportes")
     data object Login : Ruta("login")
     data object Registro : Ruta("registro")
     data object Dashboard : Ruta("dashboard")

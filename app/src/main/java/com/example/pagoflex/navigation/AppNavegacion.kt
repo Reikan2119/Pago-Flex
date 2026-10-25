@@ -1,5 +1,7 @@
 package com.example.pagoflex.navigation
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -8,9 +10,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.pagoflex.ui.screens.BienvenidaScreen
 import com.example.pagoflex.ui.screens.DashboardScreen
 import com.example.pagoflex.ui.screens.AgenteHomeScreen
+import com.example.pagoflex.ui.screens.HistorialPagosScreen
 import com.example.pagoflex.ui.screens.HomePerfilScreen
 import com.example.pagoflex.model.RolUsuario
-import com.example.pagoflex.ui.screens.HistorialPagosScreen
+import com.example.pagoflex.ui.screens.MisReportesScreen
 import com.example.pagoflex.ui.screens.LoginSimuladoScreen
 import com.example.pagoflex.ui.screens.PagoScreen
 import com.example.pagoflex.ui.screens.PerfilScreen
@@ -36,7 +39,11 @@ fun AppNavegacion() {
 
     NavHost(
         navController = navController,
-        startDestination = Ruta.Bienvenida.ruta
+        startDestination = Ruta.Bienvenida.ruta,
+        enterTransition = { fadeIn() },
+        exitTransition = { fadeOut() },
+        popEnterTransition = { fadeIn() },
+        popExitTransition = { fadeOut() }
     ) {
 
         composable(Ruta.Bienvenida.ruta) {
@@ -51,7 +58,7 @@ fun AppNavegacion() {
                 viewModel = authViewModel,
                 onLoginSuccess = {
                     val u = authViewModel.uiState.value
-                    viewModel.iniciarSesion(u.idUsuarioLogueado, u.nombreLogin, u.perfilCorreo, u.rolSeleccionado ?: RolUsuario.USUARIO_FINAL)
+                    viewModel.iniciarSesion(u.idUsuarioLogueado, u.nombreLogin, u.perfilCorreo, u.perfilRut, u.perfilComuna, u.rolSeleccionado ?: RolUsuario.USUARIO_FINAL)
                     val destino = if (u.rolSeleccionado == RolUsuario.AGENTE) Ruta.AgenteHome.ruta else Ruta.HomePerfil.ruta
                     navController.navigate(destino) {
                         popUpTo(Ruta.Bienvenida.ruta) { inclusive = true }
@@ -81,6 +88,7 @@ fun AppNavegacion() {
                 onNavegarARegistrar = { navController.navigate(Ruta.RegistrarCompromiso.ruta) { launchSingleTop = true } },
                 onNavegarACartera = { navController.navigate(Ruta.Pagar.ruta) { launchSingleTop = true } },
                 onCerrarSesion = {
+                    authViewModel.cerrarSesion()
                     viewModel.cerrarSesion()
                     navController.navigate(Ruta.Bienvenida.ruta) { popUpTo(Ruta.AgenteHome.ruta) { inclusive = true } }
                 }
@@ -92,8 +100,10 @@ fun AppNavegacion() {
                 viewModel = viewModel,
                 onNavegarAPagar = { navController.navigate(Ruta.Pagar.ruta) { launchSingleTop = true; popUpTo(Ruta.HomePerfil.ruta) { inclusive = false } } },
                 onNavegarAHistorial = { navController.navigate(Ruta.HistorialPagos.ruta) { launchSingleTop = true; popUpTo(Ruta.HomePerfil.ruta) { inclusive = false } } },
+                onNavegarAMisReportes = { navController.navigate(Ruta.MisReportes.ruta) { launchSingleTop = true; popUpTo(Ruta.HomePerfil.ruta) { inclusive = false } } },
                 onNavegarAEditarPerfil = { navController.navigate(Ruta.Perfil.ruta) { launchSingleTop = true; popUpTo(Ruta.HomePerfil.ruta) { inclusive = false } } },
                 onCerrarSesion = {
+                    authViewModel.cerrarSesion()
                     viewModel.cerrarSesion()
                     navController.navigate(Ruta.Bienvenida.ruta) { popUpTo(Ruta.HomePerfil.ruta) { inclusive = true } }
                 }
@@ -112,6 +122,7 @@ fun AppNavegacion() {
                 onNavegarAReportesAgente = { navController.navigate(Ruta.ReportesAgente.ruta) { launchSingleTop = true } },
                 onNavegarAResumenCobranza = { navController.navigate(Ruta.ResumenCobranza.ruta) { launchSingleTop = true } },
                 onCerrarSesion = {
+                    authViewModel.cerrarSesion()
                     viewModel.cerrarSesion()
                     navController.navigate(Ruta.Bienvenida.ruta) { popUpTo(Ruta.Pagar.ruta) { inclusive = true } }
                 }
@@ -120,6 +131,13 @@ fun AppNavegacion() {
 
         composable(Ruta.HistorialPagos.ruta) {
             HistorialPagosScreen(
+                viewModel = viewModel,
+                onVolver = { navController.navigateUp() }
+            )
+        }
+
+        composable(Ruta.MisReportes.ruta) {
+            MisReportesScreen(
                 viewModel = viewModel,
                 onVolver = { navController.navigateUp() }
             )

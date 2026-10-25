@@ -3,6 +3,8 @@ package com.example.pagoflex.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.rememberDatePickerState
@@ -10,6 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DateRange
@@ -36,6 +38,8 @@ fun RegistrarCompromisoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(Unit) { viewModel.cargarClientes() }
+
     var mostrarDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
 
@@ -43,6 +47,7 @@ fun RegistrarCompromisoScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Registrar Compromiso - PagoFlex") },
+            navigationIcon = { IconButton(onClick = onVolver) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 
             )
         }
@@ -63,25 +68,74 @@ fun RegistrarCompromisoScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedTextField(
-                value = uiState.rutClienteCompromiso,
-                onValueChange = { viewModel.onRutClienteCompromisoCambia(it) },
-                label = { Text("RUT del Cliente") },
-                leadingIcon = { Icon(Icons.Filled.Badge, contentDescription = "RUT") },
-                isError = uiState.errorRutClienteCompromiso != null,
-                modifier = Modifier.fillMaxWidth(),
-                shape = EstilosCampo.forma,
-                singleLine = true
-            )
-            if (uiState.errorRutClienteCompromiso != null) {
-                Text(
-                    text = uiState.errorRutClienteCompromiso!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, top = 4.dp)
+            if (uiState.clientesDisponibles.isEmpty()) {
+                OutlinedTextField(
+                    value = uiState.rutClienteCompromiso,
+                    onValueChange = { viewModel.onRutClienteCompromisoCambia(it) },
+                    label = { Text("RUT del Cliente") },
+                    isError = uiState.errorRutClienteCompromiso != null,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = EstilosCampo.forma,
+                    colors = EstilosCampo.colores(),
+                    singleLine = true
                 )
+                if (uiState.errorRutClienteCompromiso != null) {
+                    Text(
+                        text = uiState.errorRutClienteCompromiso!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp)
+                    )
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { viewModel.onMostrarListaClientes(true) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = EstilosCampo.forma
+                ) {
+                    Text(if (uiState.rutClienteCompromiso.isBlank()) "Buscar cliente (RUT)" else "RUT: ${uiState.rutClienteCompromiso}")
+                }
+                if (uiState.errorRutClienteCompromiso != null) {
+                    Text(
+                        text = uiState.errorRutClienteCompromiso!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp)
+                    )
+                }
+
+                if (uiState.mostrarListaClientes) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.onMostrarListaClientes(false) },
+                        title = { Text("Seleccionar cliente") },
+                        text = {
+                            Column {
+                                uiState.clientesDisponibles.forEach { c ->
+                                    TextButton(onClick = { viewModel.onSeleccionarCliente(c) }, modifier = Modifier.fillMaxWidth()) {
+                                        Text("${c.nombre} - ${c.rut}")
+                                    }
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { viewModel.onMostrarListaClientes(false) }) { Text("Cerrar") }
+                        }
+                    )
+                }
+
+                if (uiState.confirmarCliente && uiState.clienteSeleccionado != null) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.onCancelarCliente() },
+                        title = { Text("Confirmar cliente") },
+                        text = { Text("¿Es ${uiState.clienteSeleccionado!!.nombre} el usuario final al que registrarás el compromiso?") },
+                        confirmButton = {
+                            TextButton(onClick = { viewModel.onConfirmarCliente() }) { Text("Sí") }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { viewModel.onCancelarCliente() }) { Text("No") }
+                        }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -112,7 +166,7 @@ fun RegistrarCompromisoScreen(
             OutlinedTextField(
                 value = uiState.montoCompromiso,
                 onValueChange = { viewModel.onMontoCompromisoCambia(it) },
-                label = { Text("Monto (\$ mayor a 0) (RN-20)") },
+                label = { Text("Monto ($ mayor a 0)") },
                 leadingIcon = { Icon(Icons.Filled.AttachMoney, contentDescription = "Monto") },
                 isError = uiState.errorMontoCompromiso != null,
                 modifier = Modifier.fillMaxWidth(),
@@ -198,6 +252,9 @@ fun RegistrarCompromisoScreen(
         }
     }
 }
+
+
+
 
 
 

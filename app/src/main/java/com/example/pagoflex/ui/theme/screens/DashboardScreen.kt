@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.Row
 import com.example.pagoflex.ui.components.AvatarIniciales
 import com.example.pagoflex.ui.components.InsigniaRol
 import com.example.pagoflex.ui.theme.colorDeRol
+import com.example.pagoflex.viewmodel.PagoFlexViewModel
 import com.example.pagoflex.ui.style.EstilosBoton
 import com.example.pagoflex.ui.style.EstilosCampo
 import com.example.pagoflex.ui.style.EstilosTarjeta
-import com.example.pagoflex.viewmodel.PagoFlexViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.rememberDrawerState
@@ -79,6 +81,7 @@ fun DashboardScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.dashboard_title)) },
+                navigationIcon = { IconButton(onClick = onNavegarAPerfil) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 actions = {
                     // cerrar sesión movido al menú del perfil
                 }
@@ -219,7 +222,7 @@ fun DashboardScreen(
                         .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiState.compromisos) { compromiso ->
+                    items(uiState.compromisos.filter { it.idEstadoCompromiso != 3 }) { compromiso ->
                         CompromisoItemCard(
                             compromiso = compromiso,
                             mostrarAccionPagar = VisibilidadPorRol.puedePagar(uiState.rolSeleccionado),

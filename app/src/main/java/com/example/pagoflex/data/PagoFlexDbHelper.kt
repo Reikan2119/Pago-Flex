@@ -8,7 +8,7 @@ class PagoFlexDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
 
     companion object {
         const val DB_NAME = "pagoflex.db"
-        const val DB_VERSION = 3
+        const val DB_VERSION = 4
     }
 
     override fun onCreate(db: SQLiteDatabase) {

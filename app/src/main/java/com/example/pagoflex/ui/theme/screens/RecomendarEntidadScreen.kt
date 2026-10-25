@@ -3,6 +3,8 @@ package com.example.pagoflex.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -11,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.LocationOn
@@ -34,6 +35,7 @@ fun RecomendarEntidadScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Recomendar Entidad - PagoFlex") },
+            navigationIcon = { IconButton(onClick = onVolver) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 
             )
         }
@@ -152,6 +154,7 @@ fun RecomendarEntidadScreen(
         }
     }
 }
+
 
 
 

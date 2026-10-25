@@ -1,19 +1,28 @@
 package com.example.pagoflex.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Flag
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
 import com.example.pagoflex.ui.style.EstilosBoton
+import androidx.compose.ui.text.font.FontWeight
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.example.pagoflex.ui.style.EstilosCampo
 import com.example.pagoflex.ui.style.EstilosTarjeta
 import com.example.pagoflex.viewmodel.PagoFlexViewModel
@@ -29,14 +38,27 @@ fun ReporteProblemaScreen(
     val motivosDisponibles = listOf("Pago no reflejado", "Monto incorrecto", "Error en convenio", "Otro")
 
     var fotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var fotoBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val lanzadorFoto = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         fotoUri = uri
+    }
+    val lanzadorCamara = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+        fotoBitmap = bitmap
+    }
+    val context = LocalContext.current
+
+    val permisoGaleriaLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) lanzadorFoto.launch("image/*")
+    }
+    val permisoCamaraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) lanzadorCamara.launch(null)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Reportar Problema - PagoFlex") },
+            navigationIcon = { IconButton(onClick = onVolver) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 
             )
         }
@@ -120,18 +142,40 @@ fun ReporteProblemaScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedButton(
-                onClick = { lanzadorFoto.launch("image/*") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = EstilosCampo.forma
-            ) {
-                Text(if (fotoUri == null) "Adjuntar foto (opcional)" else "Foto seleccionada")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = {
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
+                            lanzadorFoto.launch("image/*")
+                        } else {
+                            permisoGaleriaLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = EstilosCampo.forma
+                ) {
+                    Text(if (fotoUri == null) "Adjuntar foto" else "Foto seleccionada")
+                }
+                OutlinedButton(
+                    onClick = {
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            lanzadorCamara.launch(null)
+                        } else {
+                            permisoCamaraLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = EstilosCampo.forma
+                ) {
+                    Text(if (fotoBitmap == null) "Tomar foto" else "Foto tomada")
+                }
             }
-            if (fotoUri != null) {
-                Text(
-                    text = fotoUri.toString(),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
+            if (fotoBitmap != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Image(
+                    bitmap = fotoBitmap!!.asImageBitmap(),
+                    contentDescription = "Foto tomada",
+                    modifier = Modifier.size(120.dp)
                 )
             }
 
@@ -158,6 +202,7 @@ fun ReporteProblemaScreen(
         }
     }
 }
+
 
 
 

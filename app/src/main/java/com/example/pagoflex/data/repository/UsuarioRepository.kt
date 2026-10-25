@@ -59,4 +59,39 @@ class UsuarioRepository(private val dbHelper: PagoFlexDbHelper) {
         }
         db.update("usuario", values, "id_usuario=?", arrayOf(id.toString()))
     }
+
+    fun existeCorreo(correo: String): Boolean {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT 1 FROM usuario WHERE correo=?", arrayOf(correo))
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        return exists
+    }
+
+    fun existeRut(rut: String): Boolean {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT 1 FROM usuario WHERE rut=?", arrayOf(rut))
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        return exists
+    }
+
+    fun obtenerUsuariosFinales(): List<UsuarioDb> {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT id_usuario, nombre, correo, id_rol, id_empresa, rut, comuna FROM usuario WHERE id_rol=1", null)
+        val lista = mutableListOf<UsuarioDb>()
+        while (cursor.moveToNext()) {
+            lista.add(UsuarioDb(
+                id = cursor.getInt(0),
+                nombre = cursor.getString(1) ?: "",
+                correo = cursor.getString(2) ?: "",
+                idRol = cursor.getInt(3),
+                idEmpresa = if (cursor.isNull(4)) null else cursor.getInt(4),
+                rut = cursor.getString(5),
+                comuna = cursor.getString(6)
+            ))
+        }
+        cursor.close()
+        return lista
+    }
 }

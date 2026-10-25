@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +38,7 @@ fun ReportesAgenteScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Reportes de Problema (Agente)") },
+            navigationIcon = { IconButton(onClick = onVolver) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 
             )
         }
@@ -107,6 +110,7 @@ private fun diasSinGestionar(fecha: String): Int {
         diff.toInt()
     } catch (e: Exception) { 0 }
 }
+
 
 
 

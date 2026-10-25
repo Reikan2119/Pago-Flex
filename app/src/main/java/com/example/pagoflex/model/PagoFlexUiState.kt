@@ -1,13 +1,7 @@
 package com.example.pagoflex.model
 data class PagoFlexUiState(
-    val correoLogin: String = "",
-    val errorCorreoLogin: String? = null,
-    val contrasenaLogin: String = "",
-    val errorContrasenaLogin: String? = null,
     val nombreLogin: String = "",
-    val errorNombreLogin: String? = null,
     val rolSeleccionado: RolUsuario? = null,
-    val errorRolLogin: String? = null,
     val sesionIniciada: Boolean = false,
 
     val idUsuarioLogueado: Int = 0,
@@ -15,18 +9,7 @@ data class PagoFlexUiState(
     val perfilCorreo: String = "",
     val perfilComuna: String = "",
     val perfilRut: String = "",
-
-    val nombreRegistro: String = "",
-    val errorNombreRegistro: String? = null,
-    val rutRegistro: String = "",
-    val errorRutRegistro: String? = null,
-    val comunaRegistro: String = "",
-    val errorComunaRegistro: String? = null,
-    val correoRegistro: String = "",
-    val errorCorreoRegistro: String? = null,
-    val contrasenaRegistro: String = "",
-    val errorContrasenaRegistro: String? = null,
-    val registroUsuarioExitoso: Boolean = false,
+    val perfilGuardadoExitoso: Boolean = false,
 
     val compromisos: List<Compromiso> = emptyList(),
 
@@ -37,6 +20,10 @@ data class PagoFlexUiState(
 
     val rutClienteCompromiso: String = "",
     val errorRutClienteCompromiso: String? = null,
+    val clientesDisponibles: List<Cliente> = emptyList(),
+    val mostrarListaClientes: Boolean = false,
+    val clienteSeleccionado: Cliente? = null,
+    val confirmarCliente: Boolean = false,
     val conceptoCompromiso: String = "",
     val errorConceptoCompromiso: String? = null,
     val montoCompromiso: String = "",
@@ -74,6 +61,7 @@ data class PagoFlexUiState(
     val mostrarComprobante: Boolean = false,
 
     val reportesAgente: List<ReporteProblema> = emptyList(),
+    val reportesUsuario: List<ReporteProblema> = emptyList(),
     val recomendacionesAgente: List<Recomendacion> = emptyList(),
     val respuestaReporte: String = ""
 )

@@ -2,6 +2,8 @@ package com.example.pagoflex.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +27,7 @@ fun ResumenCobranzaScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Resumen de Cobranza") },
+            navigationIcon = { IconButton(onClick = onVolver) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 
             )
         }
@@ -44,6 +47,7 @@ fun ResumenCobranzaScreen(
         }
     }
 }
+
 
 
 

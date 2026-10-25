@@ -54,25 +54,44 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Registro
-    fun onNombreRegistroCambia(v: String) = _uiState.update { it.copy(nombreRegistro = v, errorNombreRegistro = null) }
-    fun onRutRegistroCambia(v: String) = _uiState.update { it.copy(rutRegistro = v, errorRutRegistro = null) }
+    fun onNombreRegistroCambia(v: String) {
+        val error = if (v.any { it.isDigit() }) "El nombre no puede contener números." else null
+        _uiState.update { it.copy(nombreRegistro = v, errorNombreRegistro = error) }
+    }
+    fun onRutRegistroCambia(v: String) {
+        val filtered = v.filter { it.isDigit() || it == '-' }.take(10)
+        _uiState.update { it.copy(rutRegistro = filtered, errorRutRegistro = null) }
+    }
     fun onComunaRegistroCambia(v: String) = _uiState.update { it.copy(comunaRegistro = v, errorComunaRegistro = null) }
     fun onCorreoRegistroCambia(v: String) = _uiState.update { it.copy(correoRegistro = v, errorCorreoRegistro = null) }
     fun onContrasenaRegistroCambia(v: String) = _uiState.update { it.copy(contrasenaRegistro = v, errorContrasenaRegistro = null) }
+    fun onContrasenaConfirmacionRegistroCambia(v: String) = _uiState.update { it.copy(contrasenaConfirmacionRegistro = v, errorContrasenaConfirmacionRegistro = null) }
 
     fun onRegistrarUsuario(): Boolean {
         val e = _uiState.value
-        val errNombre = if (e.nombreRegistro.isBlank()) "El nombre es obligatorio" else null
-        val errRut = if (e.rutRegistro.isBlank()) "El RUT es obligatorio" else null
+        val regexSoloLetras = Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")
+        val errNombre = when {
+            e.nombreRegistro.isBlank() -> "El nombre es obligatorio"
+            e.nombreRegistro.trim().length < 2 -> "El nombre debe tener al menos 2 caracteres."
+            e.nombreRegistro.any { it.isDigit() } -> "El nombre no puede contener números."
+            !e.nombreRegistro.matches(regexSoloLetras) -> "El nombre solo puede contener letras."
+            else -> null
+        }
+        val errRut = if (e.rutRegistro.isBlank()) "El RUT es obligatorio"
+                     else if (usuarioRepository.existeRut(e.rutRegistro)) "El RUT ya está registrado"
+                     else null
         val errComuna = if (e.comunaRegistro.isBlank()) "La comuna es obligatoria" else null
-        val errCorreo = if (e.correoRegistro.isBlank() || !e.correoRegistro.contains("@")) "Ingresa un correo válido" else null
+        val errCorreo = if (e.correoRegistro.isBlank() || !e.correoRegistro.contains("@")) "Ingresa un correo válido"
+                       else if (usuarioRepository.existeCorreo(e.correoRegistro)) "El correo ya está registrado"
+                       else null
         val errPass = if (e.contrasenaRegistro.length < 6) "Mínimo 6 caracteres" else null
-        if (errNombre != null || errRut != null || errComuna != null || errCorreo != null || errPass != null) {
-            _uiState.update { it.copy(errorNombreRegistro = errNombre, errorRutRegistro = errRut, errorComunaRegistro = errComuna, errorCorreoRegistro = errCorreo, errorContrasenaRegistro = errPass, registroUsuarioExitoso = false) }
+        val errPassConfirm = if (e.contrasenaConfirmacionRegistro != e.contrasenaRegistro) "Las contraseñas no coinciden" else null
+        if (errNombre != null || errRut != null || errComuna != null || errCorreo != null || errPass != null || errPassConfirm != null) {
+            _uiState.update { it.copy(errorNombreRegistro = errNombre, errorRutRegistro = errRut, errorComunaRegistro = errComuna, errorCorreoRegistro = errCorreo, errorContrasenaRegistro = errPass, errorContrasenaConfirmacionRegistro = errPassConfirm, registroUsuarioExitoso = false) }
             return false
         }
         usuarioRepository.registrar(e.nombreRegistro, e.correoRegistro, e.contrasenaRegistro, e.rutRegistro, e.comunaRegistro)
-        _uiState.update { it.copy(nombreRegistro = "", rutRegistro = "", comunaRegistro = "", correoRegistro = "", contrasenaRegistro = "", registroUsuarioExitoso = true) }
+        _uiState.update { it.copy(nombreRegistro = "", rutRegistro = "", comunaRegistro = "", correoRegistro = "", contrasenaRegistro = "", contrasenaConfirmacionRegistro = "", errorNombreRegistro = null, errorRutRegistro = null, errorComunaRegistro = null, errorCorreoRegistro = null, errorContrasenaRegistro = null, errorContrasenaConfirmacionRegistro = null, registroUsuarioExitoso = true) }
         return true
     }
 

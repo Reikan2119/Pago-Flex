@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ fun HomePerfilScreen(
     viewModel: PagoFlexViewModel,
     onNavegarAPagar: () -> Unit,
     onNavegarAHistorial: () -> Unit,
+    onNavegarAMisReportes: () -> Unit,
     onNavegarAEditarPerfil: () -> Unit,
     onCerrarSesion: () -> Unit
 ) {
@@ -50,6 +52,9 @@ fun HomePerfilScreen(
                 })
                 NavigationDrawerItem(label = { Text("Historial de pagos") }, selected = false, onClick = {
                     scope.launch { drawerState.close() }; onNavegarAHistorial()
+                })
+                NavigationDrawerItem(label = { Text("Mis reportes") }, selected = false, onClick = {
+                    scope.launch { drawerState.close() }; onNavegarAMisReportes()
                 })
                 NavigationDrawerItem(
                     label = { Text("Cerrar sesión", color = Color.Red) },
@@ -100,7 +105,7 @@ fun HomePerfilScreen(
                             CampoVisible("ID de usuario", uiState.idUsuarioLogueado.toString()),
                             CampoVisible("RUT", uiState.perfilRut.ifBlank { "No registrado" }),
                             CampoVisible("Rol", rol.etiqueta),
-                            CampoVisible("Correo", uiState.perfilCorreo.ifBlank { uiState.correoLogin }),
+                            CampoVisible("Correo", uiState.perfilCorreo.ifBlank { "No registrado" }),
                             CampoVisible("Comuna", uiState.perfilComuna.ifBlank { "No registrada" })
                         )
                     )
@@ -109,6 +114,7 @@ fun HomePerfilScreen(
         }
     }
 }
+
 
 
 

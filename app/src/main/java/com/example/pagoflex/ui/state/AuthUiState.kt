@@ -26,5 +26,7 @@ data class AuthUiState(
     val errorCorreoRegistro: String? = null,
     val contrasenaRegistro: String = "",
     val errorContrasenaRegistro: String? = null,
+    val contrasenaConfirmacionRegistro: String = "",
+    val errorContrasenaConfirmacionRegistro: String? = null,
     val registroUsuarioExitoso: Boolean = false
 )
