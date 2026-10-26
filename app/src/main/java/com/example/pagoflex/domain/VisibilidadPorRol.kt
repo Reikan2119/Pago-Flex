@@ -14,3 +14,4 @@ object VisibilidadPorRol {
     fun esSupervisor(rol: RolUsuario?): Boolean =
         rol == RolUsuario.AGENTE || rol == RolUsuario.EJECUTIVO
 }
+

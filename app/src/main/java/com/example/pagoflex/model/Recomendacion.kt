@@ -5,3 +5,4 @@ data class Recomendacion(
     val nombre: String,
     val estado: String
 )
+

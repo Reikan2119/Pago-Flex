@@ -20,7 +20,7 @@ fun ResumenCobranzaScreen(
     onVolver: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val idEmpresa = uiState.idUsuarioLogueado.let { /* ejecutivo empresa */ 1 } // simplificado
+    val idEmpresa = uiState.idUsuarioLogueado.let {  1 } 
     val (pagados, pendientes, vencidos) = viewModel.resumenCobranzaEmpresa(idEmpresa)
 
     Scaffold(
@@ -47,6 +47,7 @@ fun ResumenCobranzaScreen(
         }
     }
 }
+
 
 
 

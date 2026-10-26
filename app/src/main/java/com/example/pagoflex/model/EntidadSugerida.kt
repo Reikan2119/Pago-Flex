@@ -5,3 +5,4 @@ data class EntidadSugerida(
     val rubro: String,
     val comuna: String
 )
+

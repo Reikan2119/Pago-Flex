@@ -80,3 +80,4 @@ class CompromisoRepository(private val dbHelper: PagoFlexDbHelper) : Repositorio
         return db.rawQuery("SELECT fecha_pago, monto, folio FROM comprobante WHERE id_compromiso=? ORDER BY id_comprobante DESC LIMIT 1", arrayOf(idCompromiso.toString()))
     }
 }
+

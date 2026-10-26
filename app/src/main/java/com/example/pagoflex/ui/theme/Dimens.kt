@@ -22,3 +22,4 @@ object Dimens {
 
     val avatarGrande = 96.dp
 }
+

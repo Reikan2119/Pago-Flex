@@ -5,3 +5,4 @@ data class Cliente(
     val nombre: String,
     val rut: String
 )
+

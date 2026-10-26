@@ -8,3 +8,4 @@ fun colorDeRol(rol: RolUsuario): Color = when (rol) {
     RolUsuario.AGENTE -> Color(0xFFEF6C00)
     RolUsuario.EJECUTIVO -> Color(0xFF1565C0)
 }
+

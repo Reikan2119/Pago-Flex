@@ -52,3 +52,4 @@ class RecomendacionRepository(private val dbHelper: PagoFlexDbHelper) {
         db.insert("recomendacion_entidad", null, values)
     }
 }
+

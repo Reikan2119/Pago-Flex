@@ -5,3 +5,4 @@ enum class RolUsuario(val etiqueta: String) {
     AGENTE("Agente PagoFlex"),
     EJECUTIVO("Ejecutivo de Empresa")
 }
+

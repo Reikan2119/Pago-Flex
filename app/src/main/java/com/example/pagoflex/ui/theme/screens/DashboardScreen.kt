@@ -83,7 +83,7 @@ fun DashboardScreen(
                 title = { Text(stringResource(R.string.dashboard_title)) },
                 navigationIcon = { IconButton(onClick = onNavegarAPerfil) { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") } },
                 actions = {
-                    // cerrar sesión movido al menú del perfil
+                    
                 }
             )
         }
@@ -242,6 +242,7 @@ fun DashboardScreen(
     }
 }
 }
+
 
 
 

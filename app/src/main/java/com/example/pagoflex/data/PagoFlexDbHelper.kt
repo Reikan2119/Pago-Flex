@@ -86,7 +86,7 @@ class PagoFlexDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
             )
         """.trimIndent())
 
-        // Precarga
+        
         db.execSQL("INSERT INTO rol_usuario (id_rol, etiqueta) VALUES (1,'Usuario Final')")
         db.execSQL("INSERT INTO rol_usuario (id_rol, etiqueta) VALUES (2,'Agente PagoFlex')")
         db.execSQL("INSERT INTO rol_usuario (id_rol, etiqueta) VALUES (3,'Ejecutivo de Empresa')")
@@ -114,3 +114,4 @@ class PagoFlexDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         onCreate(db)
     }
 }
+

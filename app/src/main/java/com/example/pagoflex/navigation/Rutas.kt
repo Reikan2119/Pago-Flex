@@ -21,3 +21,4 @@ sealed class Ruta(val ruta: String) {
     data object RecomendacionesAgente : Ruta("recomendaciones_agente")
     data object ResumenCobranza : Ruta("resumen_cobranza")
 }
+

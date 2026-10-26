@@ -46,3 +46,4 @@ fun AvatarIniciales(iniciales: String, color: Color, modifier: Modifier = Modifi
         )
     }
 }
+

@@ -509,11 +509,3 @@ class PagoFlexViewModel(application: Application) : AndroidViewModel(application
             _uiState.update { it.copy(reportesUsuario = reporteRepository.obtenerPorUsuario(id)) }
         }
     }}
-
-
-
-
-
-
-
-

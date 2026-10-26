@@ -53,7 +53,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         return true
     }
 
-    // Registro
+    
     fun onNombreRegistroCambia(v: String) {
         val error = if (v.any { it.isDigit() }) "El nombre no puede contener números." else null
         _uiState.update { it.copy(nombreRegistro = v, errorNombreRegistro = error) }

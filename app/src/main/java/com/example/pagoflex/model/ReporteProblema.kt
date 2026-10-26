@@ -10,3 +10,4 @@ data class ReporteProblema(
     val respuesta: String?,
     val fechaGestion: String?
 )
+

@@ -65,3 +65,4 @@ data class PagoFlexUiState(
     val recomendacionesAgente: List<Recomendacion> = emptyList(),
     val respuestaReporte: String = ""
 )
+

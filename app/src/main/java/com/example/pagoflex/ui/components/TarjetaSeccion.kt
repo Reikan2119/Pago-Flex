@@ -53,3 +53,4 @@ fun TarjetaSeccion(seccion: SeccionDatos, modifier: Modifier = Modifier) {
         }
     }
 }
+

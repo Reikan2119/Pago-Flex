@@ -42,3 +42,4 @@ object EstilosBoton {
 }
 
 fun Modifier.estiloAltoBoton(): Modifier = this.height(Dimens.alturaBoton)
+

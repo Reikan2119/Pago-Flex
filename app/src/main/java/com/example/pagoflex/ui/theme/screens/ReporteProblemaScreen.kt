@@ -115,7 +115,7 @@ fun ReporteProblemaScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campo de Comentario
+            
             OutlinedTextField(
                 value = uiState.comentarioReporte,
                 onValueChange = { viewModel.onComentarioReporteCambia(it) },
@@ -202,6 +202,7 @@ fun ReporteProblemaScreen(
         }
     }
 }
+
 
 
 

@@ -13,3 +13,4 @@ object EstilosTarjeta {
     @Composable
     fun elevacion(): CardElevation = CardDefaults.cardElevation(defaultElevation = Dimens.elevacionTarjeta)
 }
+

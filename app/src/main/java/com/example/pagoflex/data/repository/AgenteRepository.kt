@@ -81,3 +81,4 @@ class RecomendacionGestionRepository(private val dbHelper: PagoFlexDbHelper) {
         db.update("recomendacion_entidad", values, "id_recomendacion=?", arrayOf(id.toString()))
     }
 }
+

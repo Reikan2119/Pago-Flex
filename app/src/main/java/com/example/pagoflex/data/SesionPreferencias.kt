@@ -21,3 +21,4 @@ class SesionPreferencias(context: Context) {
         prefs.edit { remove(CLAVE_ID_USUARIO) }
     }
 }
+

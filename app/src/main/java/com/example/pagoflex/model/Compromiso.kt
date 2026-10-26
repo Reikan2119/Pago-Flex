@@ -25,3 +25,4 @@ data class Compromiso(
 
     fun totalAPagar(): Int = monto + recargoAtraso()
 }
+

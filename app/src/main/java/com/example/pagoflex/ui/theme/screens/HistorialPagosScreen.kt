@@ -45,7 +45,7 @@ fun HistorialPagosScreen(
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Filtro empresa
+                
                 var expandedE by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(expanded = expandedE, onExpandedChange = { expandedE = !expandedE }, modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
@@ -62,7 +62,7 @@ fun HistorialPagosScreen(
                         }
                     }
                 }
-                // Filtro período
+                
                 var expandedP by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(expanded = expandedP, onExpandedChange = { expandedP = !expandedP }, modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
@@ -102,6 +102,7 @@ fun HistorialPagosScreen(
         }
     }
 }
+
 
 
 

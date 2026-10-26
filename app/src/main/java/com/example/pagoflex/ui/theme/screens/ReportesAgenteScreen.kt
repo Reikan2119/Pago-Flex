@@ -44,7 +44,7 @@ fun ReportesAgenteScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            // Filtro por estado
+            
             var expanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
@@ -110,6 +110,7 @@ private fun diasSinGestionar(fecha: String): Int {
         diff.toInt()
     } catch (e: Exception) { 0 }
 }
+
 
 
 

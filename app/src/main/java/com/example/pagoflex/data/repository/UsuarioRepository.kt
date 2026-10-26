@@ -95,3 +95,4 @@ class UsuarioRepository(private val dbHelper: PagoFlexDbHelper) {
         return lista
     }
 }
+
